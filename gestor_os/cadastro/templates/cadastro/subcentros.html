@@ -1,0 +1,14 @@
+<ul>
+    {% for item in subcentros %}
+        <li>
+            {% if item.filhos %}
+                <span class="tree-toggle font-bold">{{ item.centro.descricao }} - {{ item.centro.cod_centro }}</span>
+                <ul class="nested">
+                    {% include 'cadastro/subcentros.html' with subcentros=item.filhos %}
+                </ul>
+            {% else %}
+                {{ item.centro.descricao }} - {{ item.centro.cod_centro }}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

@@ -1,0 +1,40 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br" class="h-full bg-slate-900 text-white">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Gestor OS</title>
+
+        <!-- Tailwind CSS via CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="icon" href="{% static 'favicon.ico' %}"
+            type="image/x-icon" />
+
+        <!-- Estilos e scripts adicionais -->
+        {% block head %}{% endblock head %}
+    </head>
+    <body class="h-full min-h-screen antialiased">
+        
+        <!-- Botão Voltar/Logout-->
+        <div class="fixed top-4 right-4 z-50">
+            {% block top_right_button %}
+                <!-- Botão padrão: Voltar -->
+                <a href="#" class="flex items-center gap-2 text-sm text-slate-400 hover:text-white bg-slate-800 px-3 py-1 rounded transition duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Voltar
+                </a>
+            {% endblock %}
+        </div>
+        <!-- Bloco principal de conteúdo -->
+        {% block body %}{% endblock body %}
+
+        <!-- Scripts globais -->
+        
+    </body>
+
+</html>

@@ -1,0 +1,113 @@
+/* Container principal */
+.container {
+    display: flex;
+    gap: 2rem;
+    height: 100vh; /* Tela cheia */
+    padding: 1rem;
+}
+
+/* Painel esquerdo: formulário */
+.left-panel {
+    width: 40%;
+    background-color: #1e293b;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    height: 100%; /* Ocupa toda altura do container */
+}
+
+/* Painel direito: lista hierárquica */
+.right-panel {
+    width: 60%;
+    background-color: #1e293b;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    height: 100%; /* Ocupa toda altura do container */
+}
+
+/* Formulário */
+.left-panel form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.left-panel label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+    color: #f1f5f9;
+}
+
+.left-panel input,
+.left-panel select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background-color: #0f172a;
+    border: 1px solid #475569;
+    border-radius: 0.5rem;
+    color: #f1f5f9;
+    font-size: 0.9rem;
+}
+
+.left-panel input:focus,
+.left-panel select:focus {
+    outline: none;
+    border-color: #6366f1; /* Azul */
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
+}
+
+/* Botão de cadastro */
+.left-panel button {
+    padding: 0.5rem 1rem;
+    background-color: #6366f1;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.left-panel button:hover {
+    background-color: #4f46e5;
+}
+
+/* Lista árvore */
+.tree, .nested {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.tree li, .nested li {
+    margin: 0.5rem 0;
+    position: relative;
+}
+
+/* Oculta filhos inicialmente */
+.nested {
+    display: none;
+    padding-left: 1.5rem;
+    border-left: 1px dashed #475569;
+}
+
+/* Toggle cursor */
+.tree-toggle {
+    cursor: pointer;
+    font-weight: bold;
+    display: inline-block;
+    color: #f1f5f9; /* Branco suave */
+}
+
+/* Ícone de seta antes do item */
+.tree-toggle::before {
+    content: "▶";
+    display: inline-block;
+    margin-right: 0.5rem;
+    transform: rotate(0deg);
+    transition: transform 0.2s;
+}
+
+/* Quando ativo, seta vira para baixo */
+.tree-toggle.active::before {
+    transform: rotate(90deg);
+}

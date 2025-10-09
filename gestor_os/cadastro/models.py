@@ -6,8 +6,8 @@ from django.db import models
 # =====================================================
 
 class CentroCusto(models.Model):
-    descricao = models.CharField(max_length=100)
     cod_centro = models.IntegerField(primary_key=True)
+    descricao = models.CharField(max_length=100)
     centro_pai = models.ForeignKey(
         'self',
         on_delete=models.CASCADE,
