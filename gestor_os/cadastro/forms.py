@@ -1,5 +1,5 @@
 from django import forms
-from .models import CentroCusto
+from .models import CentroCusto, Cliente
 
 # =====================================================
 # Formulário para a Tag Centro de Custos 
@@ -16,3 +16,13 @@ class CentroCustoForm(forms.ModelForm):
         self.fields['centro_pai'].queryset = CentroCusto.objects.filter(centro_pai__isnull=True)
         self.fields['centro_pai'].label = "Centro de Custo Pai (opcional)"
         self.fields['centro_pai'].required = False
+
+# =====================================================
+# Formulário para cadastro de Clientes
+# =====================================================
+
+class ClienteForm (forms.ModelForm):
+    class Meta:
+        model = Cliente
+        fields = ['cod_cliente', 'nome_cliente']
+       

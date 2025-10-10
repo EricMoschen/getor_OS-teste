@@ -1,21 +1,27 @@
 {% extends "base.html" %}
 {% load static %}
 
-    
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 {% endblock head %}
 
 {% block body %}
 <div class="dashboard-container">
-    <h1 class="dashboard-title">Painel de Ordens de Serviço</h1>
-    
+    <h1 class="dashboard-title">Painel de Cadastros</h1>
+
     <div class="dashboard-grid">
-        <!-- Exemplo de card -->
-        <a href="{% url 'cadastrar_centro_custo' %}" class="dashboard-card">
+
+        <!-- Cadastro de Centro de Custos -->
+        <a href="{% url 'cadastrar_centro_custo' %}" class="dashboard-card color-purple">
             <h2 class="card-title">Centro de Custos</h2>
         </a>
-        <!-- Adicione outros cards aqui -->
+
+        <!-- Cadastro de Clientes -->
+        <a href="{% url 'cadastro_cliente' %}" class="dashboard-card color-yellow">
+            <h2 class="card-title">Clientes</h2>
+        </a>
+
+
     </div>
 </div>
 {% endblock %}

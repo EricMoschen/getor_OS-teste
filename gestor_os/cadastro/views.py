@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from .forms import CentroCustoForm
-from .models import CentroCusto   
+from .forms import CentroCustoForm, ClienteForm
+from .models import CentroCusto, Cliente
 
 
 
@@ -28,7 +28,24 @@ def cadastrar_centro_custo(request):
     centros_pai = CentroCusto.objects.filter(centro_pai__isnull=True).prefetch_related('subcentros')
     hierarquia = montar_hierarquia(centros_pai)
 
-    return render(request, 'cadastro/cadastro_centro_custo.html', {
+    return render(request, 'cadastro_centro/cadastro_centro_custo.html', {
         'form': form,
         'hierarquia': hierarquia
     })
+
+
+
+# =====================================================
+# Cadastro de Clientes
+# =====================================================
+
+
+def cadastro_cliente(request):
+    if request.method == 'POST':
+        cod = request.POST.get('cod_cliente')
+        nome = request.POST.get('nome_cliente')
+        if cod and nome:
+            Cliente.objects.create(cod_cliente=cod, nome_cliente=nome)
+        return redirect('cadastro_cliente')
+    clientes = Cliente.objects.all()
+    return render(request, 'cadastro_cliente/cadastro_cliente.html', {'clientes': clientes})

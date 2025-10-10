@@ -2,7 +2,7 @@ from django.db import models
 
 
 # =====================================================
-# Centro de Custos Tag 
+# Model para Centro de Custos e Tag 
 # =====================================================
 
 class CentroCusto(models.Model):
@@ -20,3 +20,17 @@ class CentroCusto(models.Model):
         if self.centro_pai:
             return f"{self.centro_pai.descricao} -> {self.descricao}"
         return self.descricao
+    
+    
+
+# =====================================================
+# Model para Cadastro de Clientes
+# =====================================================
+
+class Cliente(models.Model):
+    
+    cod_cliente = models.IntegerField(primary_key= True)
+    nome_cliente = models.CharField(max_length= 100)
+    
+    def __str__(self):
+        return f"{self.cod_cliente} - {self.nome_cliente}"

@@ -1,11 +1,11 @@
-/* Container principal do dashboard */
+/* Container principal */
 .dashboard-container {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #0f172a; /* cor de fundo */
+    background-color: #0f172a;
     color: white;
     padding: 3rem 1rem;
 }
@@ -23,28 +23,36 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
-    max-width: 650px;
+    max-width: 800px;
     width: 100%;
 }
 
 /* Estilo dos cards */
 .dashboard-card {
-    background-color: #4f46e5;
     color: white;
     padding: 1.5rem;
     border-radius: 1.5rem;
     text-align: center;
     text-decoration: none;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .dashboard-card:hover {
     transform: scale(1.05);
-    background-color: #6366f1; /* cor ao passar o mouse */
+    opacity: 0.9;
 }
 
 /* Título dentro do card */
 .card-title {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 600;
 }
+
+/* Paleta de cores dos cards */
+.color-purple { background-color: #6d28d9; }  /* Roxo */
+.color-yellow { background-color: #eab308; }  /* Amarelo */
+.color-blue   { background-color: #3b82f6; }  /* Azul */
+.color-pink   { background-color: #ec4899; }  /* Rosa */
+.color-green  { background-color: #22c55e; }  /* Verde */
+.color-orange { background-color: #f97316; }  /* Laranja */
+.color-red    { background-color: #ef4444; }  /* Vermelho */
