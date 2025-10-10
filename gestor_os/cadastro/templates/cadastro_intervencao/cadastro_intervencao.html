@@ -10,46 +10,43 @@
 
     <!-- Painel esquerdo: formulário -->
     <div class="left-panel">
-        <h2>Cadastro de Clientes</h2>
+        <h2>Cadastro de Intervenções</h2>
 
         <form method="POST">
             {% csrf_token %}
-            <label for="id_cod_cliente">Código do Cliente</label>
-            <input type="number" name="cod_cliente" id="id_cod_cliente" required>
-            
-            <label for="id_nome_cliente">Nome do Cliente</label>
-            <input type="text" name="nome_cliente" id="id_nome_cliente" required>
+            <label for="id_descricao">Descrição da Intervenção</label>
+            <input type="text" name="descricao" id="id_descricao" required>
 
             <button type="submit">Cadastrar</button>
         </form>
     </div>
 
-    <!-- Painel direito: tabela de clientes -->
+    <!-- Painel direito: tabela de intervenções -->
     <div class="right-panel">
-        <h2>Clientes Cadastrados</h2>
-        {% if clientes %}
+        <h2>Intervenções Cadastradas</h2>
+        {% if intervencoes %}
         <table class="client-table">
             <thead>
                 <tr>
                     <th>Código</th>
-                    <th>Nome</th>
+                    <th>Descrição</th>
                     <th>Excluir</th>
                 </tr>
             </thead>
             <tbody>
-                {% for cliente in clientes %}
+                {% for intervencao in intervencoes %}
                 <tr>
-                    <td>{{ cliente.pk }}</td>
-                    <td>{{ cliente.nome_cliente }}</td>
+                    <td>{{ intervencao.cod_intervencao }}</td>
+                    <td>{{ intervencao.descricao }}</td>
                     <td>
-                        <a href="#" class="delete-btn" data-id="{{ cliente.pk }}" data-nome="{{ cliente.nome_cliente }}">🗑️</a>
+                        <a href="#" class="delete-btn" data-id="{{ intervencao.pk }}" data-nome="{{ intervencao.descricao }}">🗑️</a>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <p>Nenhum cliente cadastrado ainda.</p>
+        <p>Nenhuma intervenção cadastrada.</p>
         {% endif %}
     </div>
 
@@ -81,7 +78,7 @@
             const id = btn.getAttribute("data-id");
             const nome = btn.getAttribute("data-nome");
             modalNome.textContent = nome;
-            deleteForm.action = `/cadastro/cliente/excluir/${id}/`;
+            deleteForm.action = `/cadastro/intervencao/excluir/${id}/`;
             modal.style.display = "block";
         });
     });

@@ -1,8 +1,6 @@
-from django.shortcuts import render, redirect
-from .forms import CentroCustoForm, ClienteForm
-from .models import CentroCusto, Cliente
-
-
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import CentroCustoForm, ClienteForm, Intervencao
+from .models import CentroCusto, Cliente, Intervencao
 
 
 # =====================================================
@@ -39,13 +37,40 @@ def cadastrar_centro_custo(request):
 # Cadastro de Clientes
 # =====================================================
 
-
 def cadastro_cliente(request):
     if request.method == 'POST':
         cod = request.POST.get('cod_cliente')
         nome = request.POST.get('nome_cliente')
         if cod and nome:
-            Cliente.objects.create(cod_cliente=cod, nome_cliente=nome)
-        return redirect('cadastro_cliente')
+            # Criar cliente usando o código informado pelo usuário
+            Cliente.objects.create(pk=cod, nome_cliente=nome)
+            return redirect('cadastro_cliente')
+
     clientes = Cliente.objects.all()
     return render(request, 'cadastro_cliente/cadastro_cliente.html', {'clientes': clientes})
+
+def excluir_cliente(request, pk):
+    cliente = get_object_or_404(Cliente, pk=pk)
+    if request.method == 'POST':
+        cliente.delete()
+        return redirect('cadastro_cliente')
+
+# =====================================================
+# Cadastro de Intervenções
+# =====================================================
+def cadastro_intervencao(request):
+    if request.method == 'POST':
+        descricao = request.POST.get('descricao')
+        if descricao:
+            Intervencao.objects.create(descricao=descricao)
+            return redirect('cadastro_intervencao')
+
+    intervencoes = Intervencao.objects.all()
+    return render(request, 'cadastro_intervencao/cadastro_intervencao.html', {
+        'intervencoes': intervencoes
+    })
+
+def excluir_intervencao(request, pk):
+    intervencao = get_object_or_404(Intervencao, pk=pk)
+    intervencao.delete()
+    return redirect('cadastro_intervencao')

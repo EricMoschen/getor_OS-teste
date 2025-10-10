@@ -1,5 +1,5 @@
 from django import forms
-from .models import CentroCusto, Cliente
+from .models import CentroCusto, Cliente, Intervencao
 
 # =====================================================
 # Formulário para a Tag Centro de Custos 
@@ -24,5 +24,14 @@ class CentroCustoForm(forms.ModelForm):
 class ClienteForm (forms.ModelForm):
     class Meta:
         model = Cliente
-        fields = ['cod_cliente', 'nome_cliente']
+        fields = '__all__'
        
+       
+# =====================================================
+# Formulário para cadastro de Clientes
+# =====================================================
+
+class IntervencaoForm(forms.ModelForm):
+    class Meta:
+        model = Intervencao
+        fields = '__all__'
