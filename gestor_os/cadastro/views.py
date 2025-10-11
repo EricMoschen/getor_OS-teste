@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import CentroCustoForm, ClienteForm, Intervencao
-from .models import CentroCusto, Cliente, Intervencao
+from django.contrib import messages
+from .forms import CentroCustoForm, ClienteForm, IntervencaoForm, ColaboradorForm
+from .models import CentroCusto, Cliente, Intervencao, Colaborador
 
 
 # =====================================================
@@ -74,3 +75,41 @@ def excluir_intervencao(request, pk):
     intervencao = get_object_or_404(Intervencao, pk=pk)
     intervencao.delete()
     return redirect('cadastro_intervencao')
+
+# =====================================================
+# Cadastro de Colaboradores
+# =====================================================
+
+def cadastro_colaborador(request):
+    # Formulário
+    if request.method == 'POST':
+        form = ColaboradorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Colaborador cadastrado com sucesso!')
+            return redirect('cadastro_colaborador')
+        else:
+            messages.error(request, 'Erro ao cadastrar o colaborador. Verifique os campos.')
+    else:
+        form = ColaboradorForm()
+
+    # Listagem de colaboradores
+    colaboradores = Colaborador.objects.all().order_by('nome')
+
+    context = {
+        'form': form,
+        'colaboradores': colaboradores,
+    }
+    return render(request, 'cadastro_colaborador/cadastro_colaborador.html', context)
+
+
+def excluir_colaborador(request, pk):
+    colaborador = get_object_or_404(Colaborador, pk=pk)
+
+    if request.method == 'POST':
+        colaborador.delete()
+        messages.success(request, f'Colaborador {colaborador.nome} excluído com sucesso!')
+        return redirect('cadastro_colaborador')
+
+    # Caso alguém tente acessar via GET, redireciona
+    return redirect('cadastro_colaborador')

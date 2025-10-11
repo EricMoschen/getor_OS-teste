@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/cadastro_colaborador.css' %}">
+{% endblock head %}
+
+{% block body %}
+<div class="container">
+
+    <!-- Painel esquerdo: formulário -->
+    <div class="left-panel">
+        <h2>Cadastro de Colaboradores</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <label for="id_matricula">Número da Matrícula</label>
+            {{ form.matricula }}
+
+            <label for="id_nome">Nome</label>
+            {{ form.nome }}
+
+            <label for="id_funcao">Função</label>
+            {{ form.funcao }}
+
+            <label for="id_valor_hora">Valor da Hora (R$)</label>
+            {{ form.valor_hora }}
+
+            <label for="id_turno">Turno</label>
+            {{ form.turno }}
+
+            <!-- Horários personalizados (aparecem somente se OUTROS) -->
+            <div id="horarios-personalizados">
+                <h4>Horários Personalizados</h4>
+
+                <label for="id_hr_entrada_am">Entrada (Manhã)</label>
+                {{ form.hr_entrada_am }}
+
+                <label for="id_hr_saida_am">Saída (Manhã)</label>
+                {{ form.hr_saida_am }}
+
+                <label for="id_hr_entrada_pm">Entrada (Tarde)</label>
+                {{ form.hr_entrada_pm }}
+
+                <label for="id_hr_saida_pm">Saída (Tarde)</label>
+                {{ form.hr_saida_pm }}
+            </div>
+
+            <button type="submit">Cadastrar</button>
+        </form>
+    </div>
+
+    <!-- Painel direito: tabela de colaboradores -->
+    <div class="right-panel">
+        <h2>Colaboradores Cadastrados</h2>
+        {% if colaboradores %}
+        <table class="client-table">
+            <thead>
+                <tr>
+                    <th>Matrícula</th>
+                    <th>Nome</th>
+                    <th>Função</th>
+                    <th>Valor/Hora</th>
+                    <th>Turno</th>
+                    <th>Excluir</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for colaborador in colaboradores %}
+                <tr>
+                    <td>{{ colaborador.matricula }}</td>
+                    <td>{{ colaborador.nome }}</td>
+                    <td>{{ colaborador.funcao }}</td>
+                    <td>{{ colaborador.valor_hora }}</td>
+                    <td>{{ colaborador.get_turno_display }}</td>
+                    <td>
+                        <a href="#" class="delete-btn" data-id="{{ colaborador.pk }}" data-nome="{{ colaborador.nome }}">🗑️</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhum colaborador cadastrado.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Modal de exclusão -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>Tem certeza que deseja excluir: <strong id="modalNome"></strong>?</p>
+        <form id="deleteForm" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="confirm-btn">Sim, excluir</button>
+            <button type="button" class="cancel-btn">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Modal
+    const modal = document.getElementById("deleteModal");
+    const modalNome = document.getElementById("modalNome");
+    const deleteForm = document.getElementById("deleteForm");
+    const closeBtn = document.querySelector(".close");
+    const cancelBtn = document.querySelector(".cancel-btn");
+
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", e => {
+            e.preventDefault();
+            const id = btn.getAttribute("data-id");
+            const nome = btn.getAttribute("data-nome");
+            modalNome.textContent = nome;
+            deleteForm.action = `/cadastro/colaborador/excluir/${id}/`;
+            modal.style.display = "block";
+        });
+    });
+
+    closeBtn.onclick = () => modal.style.display = "none";
+    cancelBtn.onclick = () => modal.style.display = "none";
+    window.onclick = e => { if (e.target == modal) modal.style.display = "none"; }
+
+    // Mostrar/ocultar horários personalizados dependendo do turno
+    const turnoSelect = document.getElementById('id_turno');
+    const horariosDiv = document.getElementById('horarios-personalizados');
+
+    function toggleHorarios() {
+        if (turnoSelect.value === 'OUTROS') {
+            horariosDiv.style.display = 'flex';
+        } else {
+            horariosDiv.style.display = 'none';
+        }
+    }
+
+    turnoSelect.addEventListener('change', toggleHorarios);
+    toggleHorarios(); // inicializa no carregamento
+</script>
+{% endblock %}

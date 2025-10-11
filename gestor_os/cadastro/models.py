@@ -46,3 +46,38 @@ class Intervencao(models.Model):
 
     def __str__(self):
         return f"{self.cod_intevencao} - {self.descricao}"
+    
+    
+# =====================================================
+# Model para Cadastro do Colaborador
+# =====================================================
+
+class  Colaborador(models.Model):
+    
+    TURNO_OPCOES = [
+        ('A', 'A - 07:00 às 11:00 / 12:00 às 16:48'),
+        ('B', 'B - 16:48 às 19:00 / 20:00 às 02:00'),
+        ('HC', 'H/C - 08:00 às 12:00 / 13:00 às 17:48'),
+        ('OUTROS', 'Outros'),
+    ]
+    
+    
+    matricula = models.CharField(max_length = 4, unique= True, verbose_name= 'Número da Mátricula')
+    nome = models.CharField(max_length= 255, verbose_name= 'Nome do Colaborador')
+    funcao = models.CharField(max_length= 150, verbose_name= 'Função')
+    valor_hora = models.DecimalField(max_digits= 7, decimal_places= 2, default= 0.00, verbose_name= 'Valor da Hora (R$)')
+    turno = models.CharField(max_length= 10, choices= TURNO_OPCOES, verbose_name= 'Turno')
+    
+    # Campos para horários persolanizados (quando turno for OUTROS)
+    hr_entrada_am = models.TimeField(blank= True, null= True, verbose_name= 'Entrada (Manhã)')
+    hr_saida_am = models.TimeField(blank= True, null= True, verbose_name= 'Saída (Manhã)')
+    hr_entrada_pm = models.TimeField(blank= True, null= True, verbose_name= 'Entrada (Tarde)')
+    hr_saida_pm = models.TimeField(blank= True, null= True, verbose_name= 'Saída (Tarde)')
+    
+    def __str__(self):
+        return f"{self.matricula} - {self.nome}"
+    
+    class Meta:
+        verbose_name = "Colaborador"
+        verbose_name_plural = "Colaboradores"
+        ordering = ['nome']
