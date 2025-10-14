@@ -5,5 +5,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("cadastro/", include("cadastro.urls")),
     path('', include('menu.urls')),
-    
+    path('lancamento/', include("lancamento.urls")),
 ]

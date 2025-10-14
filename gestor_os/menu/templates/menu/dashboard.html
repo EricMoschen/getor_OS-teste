@@ -7,6 +7,18 @@
 
 {% block body %}
 <div class="dashboard-container">
+
+    <h1 class="dashboard-title">Painel de Abertura</h1>
+
+    <div class="dashboard-grid">
+
+         <!-- Abertura de Ordens de serviço -->
+        <a href="{% url 'abrir_os' %}" class="dashboard-card color-blue">
+            <h2 class="card-title">Abrir OS</h2>
+        </a>
+
+    </div>
+
     <h1 class="dashboard-title">Painel de Cadastros</h1>
 
     <div class="dashboard-grid">
@@ -30,7 +42,10 @@
         <a href="{% url 'cadastro_colaborador' %}" class="dashboard-card color-blue">
             <h2 class="card-title">Colaborador</h2>
         </a>
-
     </div>
+    
 </div>
 {% endblock %}
+
+
+

@@ -45,7 +45,7 @@ class Intervencao(models.Model):
     descricao = models.CharField(max_length=200)
 
     def __str__(self):
-        return f"{self.cod_intevencao} - {self.descricao}"
+        return f"{self.cod_intervencao} - {self.descricao}"
     
     
 # =====================================================

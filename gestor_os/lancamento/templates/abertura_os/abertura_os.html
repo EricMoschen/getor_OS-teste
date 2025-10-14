@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/abrir_os.css' %}">
+{% endblock head %}
+
+{% block body %}
+<div class="container">
+
+    <!-- Painel esquerdo: Formulário de edição -->
+    <div class="left-panel">
+        <h2>Editar OS {{ os.numero_os }}</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Número da OS (readonly) -->
+            <div class="form-group">
+                <label for="numero_os">Número da OS</label>
+                <input type="text" id="numero_os" value="{{ os.numero_os }}" readonly class="input-field">
+            </div>
+
+            <!-- Campos do ModelForm -->
+            {{ form.as_p }}
+
+            <!-- Botão salvar -->
+            <button type="submit" class="save-btn">Salvar Alterações</button>
+        </form>
+
+        <!-- Botão para excluir a OS -->
+        <form method="post" action="" style="margin-top: 10px;">
+            {% csrf_token %}
+            <button type="submit" class="delete-btn">Excluir OS</button>
+        </form>
+    </div>
+
+    <!-- Painel direito: tabela de OS abertas -->
+    <div class="right-panel">
+        <h2>Ordens de Serviço</h2>
+        {% if ordens %}
+        <table class="os-table">
+            <thead>
+                <tr>
+                    <th>Nº OS</th>
+                    <th>Cliente</th>
+                    <th>Data</th>
+                    <th>Situação</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in ordens %}
+                <tr>
+                    <td>{{ o.numero_os }}</td>
+                    <td>{{ o.cliente }}</td>
+                    <td>{{ o.data_abertura|date:"d/m/Y" }}</td>
+                    <td>{{ o.get_situacao_display }}</td> <!-- Mostra "Em Aberto" ou "Finalizado" -->
+                    <td>
+                        <a href="{% url 'editar_os' o.pk %}" class="edit-btn" title="Editar OS">✏️</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhuma OS cadastrada ainda.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
