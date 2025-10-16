@@ -4,167 +4,207 @@
     justify-content: space-between;
     gap: 20px;
     padding: 30px;
+    flex-wrap: wrap;
 }
 
-/* ===== Painel esquerdo ===== */
-.left-panel {
-    flex: 1;
+/* ===== Painéis (formulário e tabela) ===== */
+/* Painel Abrir OS menor */
+.panel.abrir-os {
+    flex: 1; /* ocupa 1 parte do espaço */
     background-color: #1e293b;
     padding: 20px;
     border-radius: 12px;
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    color: #f1f5f9;
+    box-sizing: border-box;
 }
 
-.left-panel h2 {
+/* Painel Listar OS */
+.panel.tabela-os {
+    flex: 2; /* ocupa 2 partes do espaço */
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    background-color: #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    color: #f1f5f9;
+}
+
+/* Título do painel sempre visível */
+.panel.tabela-os h2 {
+    flex: 0 0 auto;
+    margin-bottom: 10px;
+}
+
+/* Container da tabela com scroll apenas no tbody */
+.os-table-container {
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+
+/* ===== Formulário ===== */
+.form-group {
     margin-bottom: 15px;
-    font-size: 1.3rem;
-    font-weight: bold;
 }
 
-.left-panel label {
-    display: block;
-    margin-top: 10px;
-    margin-bottom: 5px;
-    font-size: 0.9rem;
-}
-
-.left-panel input,
-.left-panel select,
-.left-panel textarea {
+.input-field,
+input,
+textarea,
+select {
     width: 100%;
-    padding: 8px;
+    padding: 8px 10px;
     border-radius: 6px;
-    border: 1px solid #475569;
-    background-color: #334155;
-    color: #fff;
-    font-size: 0.95rem;
+    border: 1px solid #334155;
+    background-color: #1e293b;
+    color: #f1f5f9;
+    box-sizing: border-box;
 }
 
-.left-panel input:focus {
+.input-field:focus,
+select:focus {
     outline: none;
     border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
 }
 
-.left-panel button {
-    margin-top: 20px;
-    width: 100%;
-    padding: 10px;
-    background-color: #2563eb;
+/* Botão salvar */
+.save-btn {
+    background-color: #3b82f6;
     color: #fff;
+    padding: 10px 15px;
     border: none;
-    border-radius: 6px;
-    font-weight: 600;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    font-size: 1rem;
+    transition: background-color 0.3s;
 }
 
-.left-panel button:hover {
-    background-color: #1d4ed8;
-}
-
-/* ===== Painel direito ===== */
-.right-panel {
-    flex: 1;
-    background-color: #f8fafc;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.right-panel h2 {
-    margin-bottom: 15px;
-    font-size: 1.3rem;
-    color: #0f172a;
+.save-btn:hover {
+    background-color: #2563eb;
 }
 
 /* ===== Tabela ===== */
+.os-table-container {
+    flex: 1;
+    overflow-y: auto;
+}
+
 .os-table {
     width: 100%;
     border-collapse: collapse;
+    background-color: #1e293b;
+    color: #f1f5f9;
 }
 
-.os-table th,
-.os-table td {
-    padding: 10px;
-    border-bottom: 1px solid #cbd5e1;
-    text-align: left;
-}
-
-.os-table th {
-    background-color: #e2e8f0;
-    color: #1e293b;
-    font-weight: 600;
-}
-
-.delete-btn {
-    color: #dc2626;
-    text-decoration: none;
-    font-size: 1.2rem;
-}
-
-.delete-btn:hover {
-    color: #b91c1c;
-}
-
-/* ===== Modal ===== */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-}
-
-.modal-content {
-    background: #fff;
-    margin: 15% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 350px;
-    text-align: center;
-    position: relative;
-}
-
-.modal-content p {
-    margin-bottom: 20px;
-    color: #1e293b;
-}
-
-.close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 1.3rem;
-    cursor: pointer;
-}
-
-.confirm-btn {
-    background-color: #dc2626;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.cancel-btn {
-    background-color: #475569;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-.confirm-btn:hover {
-    background-color: #b91c1c;
-}
-
-.cancel-btn:hover {
+.os-table thead {
     background-color: #334155;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.os-table th, .os-table td {
+    padding: 12px 15px;
+    text-align: left;
+    width: 20%;
+}
+
+.os-table tbody tr {
+    border-bottom: 1px solid #334155;
+    transition: background-color 0.3s;
+}
+
+.os-table tbody tr:hover {
+    background-color: #3b475a;
+}
+
+/* Botão de editar */
+.edit-btn {
+    text-decoration: none;
+    color: #3b82f6;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+
+.edit-btn:hover {
+    color: #2563eb;
+}
+
+/* Erros do formulário */
+.field-error {
+    color: #f87171;
+    font-size: 0.875rem;
+    margin-top: 4px;
+}
+
+/* ===== Dropdown árvore ===== */
+.dropdown-container { position: relative; width: 100%; }
+.dropdown-selected {
+    background-color: #1e293b;
+    color: #f1f5f9;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid #334155;
+}
+.dropdown-list {
+    position: absolute;
+    top: calc(100% + 8px);
+    width: 100%;
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 999;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+}
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    cursor: pointer;
+    color: #f1f5f9;
+}
+.dropdown-item .text { flex: 1; margin-left: 6px; }
+.dropdown-item.parent { font-weight: 600; }
+.dropdown-item.child { padding-left: 18px; font-weight: 400; }
+.dropdown-item:hover { background-color: #334155; }
+.dropdown-children { padding-left: 6px; background-color: #243046; }
+.hidden { display: none; }
+.select-parent {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #cbd5e1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+.select-parent:hover { background: rgba(255,255,255,0.03); color: #fff; }
+.arrow { width: 16px; display:inline-block; }
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    .panel.tabela-os {
+        max-height: 400px;
+    }
+}
+
+/* Scrollbar personalizado */
+.os-table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.os-table-container::-webkit-scrollbar-thumb {
+    background-color: #3b475a;
+    border-radius: 4px;
+}
+
+.os-table-container::-webkit-scrollbar-track {
+    background-color: #1e293b;
 }

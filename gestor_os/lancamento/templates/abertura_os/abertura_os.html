@@ -8,65 +8,104 @@
 {% block body %}
 <div class="container">
 
-    <!-- Painel esquerdo: Formulário de edição -->
-    <div class="left-panel">
-        <h2>Editar OS {{ os.numero_os }}</h2>
+  <!-- Painel esquerdo: Formulário de abertura -->
+  <div class="panel abrir-os">
+    <h2>Abrir OS</h2>
 
-        <form method="post">
-            {% csrf_token %}
+    <form method="post" action="{% url 'abrir_os' %}">
+      {% csrf_token %}
 
-            <!-- Número da OS (readonly) -->
-            <div class="form-group">
-                <label for="numero_os">Número da OS</label>
-                <input type="text" id="numero_os" value="{{ os.numero_os }}" readonly class="input-field">
-            </div>
+      <div class="form-group">
+        <label for="numero_os">Número da OS</label>
+        <input type="text" id="numero_os" name="numero_os"
+               value="{{ proximo_numero }}" readonly class="input-field">
+      </div>
 
-            <!-- Campos do ModelForm -->
-            {{ form.as_p }}
+      <div class="form-group">
+        <label for="centro_custo">Centro de Custo</label>
 
-            <!-- Botão salvar -->
-            <button type="submit" class="save-btn">Salvar Alterações</button>
-        </form>
+        <div class="dropdown-container">
+          <div id="dropdownSelected" class="dropdown-selected" tabindex="0">
+            {% if selected_centro_label %}{{ selected_centro_label }}{% else %}Selecione um centro de custo{% endif %}
+          </div>
 
-        <!-- Botão para excluir a OS -->
-        <form method="post" action="" style="margin-top: 10px;">
-            {% csrf_token %}
-            <button type="submit" class="delete-btn">Excluir OS</button>
-        </form>
-    </div>
+          <div id="dropdownList" class="dropdown-list hidden" role="listbox" aria-hidden="true">
+            {% for pai in pais_centro_custo %}
+              <div class="dropdown-group">
+                <div class="dropdown-item parent" data-cod="{{ pai.cod_centro }}" data-label="{{ pai.descricao }}" role="option" aria-expanded="false">
+                  <span class="arrow">▶</span>
+                  <span class="text">{{ pai.descricao }}</span>
+                </div>
+                <div class="dropdown-children hidden" id="children-{{ pai.cod_centro }}">
+                  {% for filho in pai.subcentros.all %}
+                    <div class="dropdown-item child" data-cod="{{ filho.cod_centro }}" data-label="{{ filho.descricao }}" role="option">
+                      &nbsp;&nbsp;&nbsp;• <span class="text">{{ filho.descricao }}</span>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
 
-    <!-- Painel direito: tabela de OS abertas -->
-    <div class="right-panel">
-        <h2>Ordens de Serviço</h2>
-        {% if ordens %}
-        <table class="os-table">
-            <thead>
-                <tr>
-                    <th>Nº OS</th>
-                    <th>Cliente</th>
-                    <th>Data</th>
-                    <th>Situação</th>
-                    <th>Ação</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for o in ordens %}
-                <tr>
-                    <td>{{ o.numero_os }}</td>
-                    <td>{{ o.cliente }}</td>
-                    <td>{{ o.data_abertura|date:"d/m/Y" }}</td>
-                    <td>{{ o.get_situacao_display }}</td> <!-- Mostra "Em Aberto" ou "Finalizado" -->
-                    <td>
-                        <a href="{% url 'editar_os' o.pk %}" class="edit-btn" title="Editar OS">✏️</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>Nenhuma OS cadastrada ainda.</p>
+          <input type="hidden" name="centro_custo" id="centro_custo" value="{{ form.initial.centro_custo|default:'' }}">
+        </div>
+        {% if form.errors.centro_custo %}
+          <div class="field-error">{{ form.errors.centro_custo }}</div>
         {% endif %}
+      </div>
+
+      {% for field in form %}
+        {% if field.name != "situacao" and field.name != "centro_custo" %}
+          <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}
+              <div class="field-error">{{ field.errors }}</div>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <button type="submit" class="save-btn">💾 Abrir OS</button>
+    </form>
+  </div>
+
+  <!-- Painel direito: tabela de OS abertas -->
+  <div class="panel tabela-os">
+    <h2>Ordens de Serviço</h2>
+    <div class="os-table-container">
+      {% if ordens %}
+        <table class="os-table">
+          <thead>
+            <tr>
+              <th>Nº OS</th>
+              <th>Descrição</th>
+              <th>Cliente</th>
+              <th>Situação</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in ordens %}
+              <tr>
+                <td>{{ o.numero_os }}</td>
+                <td>{{ o.descricao_os }}</td>
+                <td>{{ o.cliente }}</td>
+                <td>{{ o.get_situacao_display }}</td>
+                <td>
+                  <a href="{% url 'editar_os' o.pk %}" class="edit-btn" title="Editar OS">✏️</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>Nenhuma OS cadastrada ainda.</p>
+      {% endif %}
     </div>
+  </div>
 
 </div>
+
+<script src="{% static 'js/abrir_os.js' %}"></script>
 {% endblock %}
