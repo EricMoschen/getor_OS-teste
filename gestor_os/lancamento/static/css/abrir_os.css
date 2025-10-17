@@ -1,48 +1,40 @@
-/* ===== Layout geral ===== */
+/* ==============================================
+   LAYOUT GERAL
+============================================== */
 .container {
     display: flex;
     justify-content: space-between;
     gap: 20px;
     padding: 30px;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* permite empilhar em telas menores */
 }
 
-/* ===== Painéis (formulário e tabela) ===== */
-/* Painel Abrir OS menor */
+/* ==============================================
+   PAINÉIS: ABRIR/EDITAR OS E TABELA DE OS
+============================================== */
 .panel.abrir-os {
-    flex: 1; /* ocupa 1 parte do espaço */
-    background-color: #1e293b;
+    flex: 1; /* menor largura */
+    background: #1e293b;
     padding: 20px;
     border-radius: 12px;
     color: #f1f5f9;
-    box-sizing: border-box;
+    min-height: 400px;
 }
 
-/* Painel Listar OS */
 .panel.tabela-os {
-    flex: 2; /* ocupa 2 partes do espaço */
+    flex: 2; /* ocupa mais espaço */
     max-height: 600px;
     display: flex;
     flex-direction: column;
-    background-color: #1e293b;
+    background: #1e293b;
     border-radius: 12px;
     padding: 20px;
     color: #f1f5f9;
 }
 
-/* Título do painel sempre visível */
-.panel.tabela-os h2 {
-    flex: 0 0 auto;
-    margin-bottom: 10px;
-}
-
-/* Container da tabela com scroll apenas no tbody */
-.os-table-container {
-    flex: 1 1 auto;
-    overflow-y: auto;
-}
-
-/* ===== Formulário ===== */
+/* ==============================================
+   FORMULÁRIO
+============================================== */
 .form-group {
     margin-bottom: 15px;
 }
@@ -55,7 +47,7 @@ select {
     padding: 8px 10px;
     border-radius: 6px;
     border: 1px solid #334155;
-    background-color: #1e293b;
+    background: #1e293b;
     color: #f1f5f9;
     box-sizing: border-box;
 }
@@ -64,26 +56,46 @@ select {
 select:focus {
     outline: none;
     border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
 }
 
-/* Botão salvar */
+/* ==============================================
+   BOTÕES
+============================================== */
 .save-btn {
-    background-color: #3b82f6;
+    background: #3b82f6;
     color: #fff;
     padding: 10px 15px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-size: 1rem;
-    transition: background-color 0.3s;
+    transition: .3s;
+    margin-top: 10px;
 }
 
 .save-btn:hover {
-    background-color: #2563eb;
+    background: #2563eb;
 }
 
-/* ===== Tabela ===== */
+.delete-btn {
+    background: #ef4444;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-left: 10px;
+    transition: .3s;
+    display: none; /* aparece apenas em edição */
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+}
+
+/* ==============================================
+   TABELA DE ORDENS DE SERVIÇO
+============================================== */
 .os-table-container {
     flex: 1;
     overflow-y: auto;
@@ -92,18 +104,19 @@ select:focus {
 .os-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #1e293b;
+    background: #1e293b;
     color: #f1f5f9;
 }
 
 .os-table thead {
-    background-color: #334155;
+    background: #334155;
     position: sticky;
     top: 0;
     z-index: 2;
 }
 
-.os-table th, .os-table td {
+.os-table th,
+.os-table td {
     padding: 12px 15px;
     text-align: left;
     width: 20%;
@@ -111,54 +124,60 @@ select:focus {
 
 .os-table tbody tr {
     border-bottom: 1px solid #334155;
-    transition: background-color 0.3s;
+    transition: .3s;
 }
 
 .os-table tbody tr:hover {
-    background-color: #3b475a;
+    background: #3b475a;
 }
 
-/* Botão de editar */
 .edit-btn {
     text-decoration: none;
     color: #3b82f6;
     font-size: 1.1rem;
-    transition: color 0.3s;
+    transition: .3s;
 }
 
 .edit-btn:hover {
     color: #2563eb;
 }
 
-/* Erros do formulário */
 .field-error {
     color: #f87171;
-    font-size: 0.875rem;
+    font-size: .875rem;
     margin-top: 4px;
 }
 
-/* ===== Dropdown árvore ===== */
-.dropdown-container { position: relative; width: 100%; }
+/* ==============================================
+   DROPDOWN CENTRO DE CUSTO
+============================================== */
+.dropdown-container {
+    position: relative;
+    width: 100%;
+}
+
 .dropdown-selected {
-    background-color: #1e293b;
+    background: #1e293b;
     color: #f1f5f9;
     padding: 10px;
     border-radius: 6px;
     cursor: pointer;
     border: 1px solid #334155;
 }
+
 .dropdown-list {
     position: absolute;
     top: calc(100% + 8px);
     width: 100%;
-    background-color: #1e293b;
+    background: #1e293b;
     border: 1px solid #334155;
     border-radius: 6px;
     max-height: 280px;
     overflow-y: auto;
     z-index: 999;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
 }
+
 .dropdown-item {
     display: flex;
     align-items: center;
@@ -167,44 +186,67 @@ select:focus {
     cursor: pointer;
     color: #f1f5f9;
 }
-.dropdown-item .text { flex: 1; margin-left: 6px; }
-.dropdown-item.parent { font-weight: 600; }
-.dropdown-item.child { padding-left: 18px; font-weight: 400; }
-.dropdown-item:hover { background-color: #334155; }
-.dropdown-children { padding-left: 6px; background-color: #243046; }
-.hidden { display: none; }
-.select-parent {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.06);
-    color: #cbd5e1;
-    padding: 4px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.85rem;
-}
-.select-parent:hover { background: rgba(255,255,255,0.03); color: #fff; }
-.arrow { width: 16px; display:inline-block; }
 
-/* Responsividade */
-@media (max-width: 768px) {
+.dropdown-item .text {
+    flex: 1;
+    margin-left: 6px;
+}
+
+.dropdown-item.parent {
+    font-weight: 600;
+}
+
+.dropdown-item.child {
+    padding-left: 18px;
+    font-weight: 400;
+}
+
+.dropdown-item:hover {
+    background: #334155;
+}
+
+.dropdown-children {
+    padding-left: 6px;
+    background: #243046;
+}
+
+.hidden {
+    display: none;
+}
+
+.arrow {
+    width: 16px;
+    display: inline-block;
+}
+
+/* ==============================================
+   RESPONSIVO
+============================================== */
+@media(max-width:768px) {
     .container {
         flex-direction: column;
     }
+
     .panel.tabela-os {
         max-height: 400px;
     }
 }
 
-/* Scrollbar personalizado */
+/* ==============================================
+   SCROLL PERSONALIZADO DA TABELA
+============================================== */
 .os-table-container::-webkit-scrollbar {
     width: 8px;
 }
 
 .os-table-container::-webkit-scrollbar-thumb {
-    background-color: #3b475a;
+    background: #3b475a;
     border-radius: 4px;
 }
 
 .os-table-container::-webkit-scrollbar-track {
-    background-color: #1e293b;
+    background: #1e293b;
 }
+
+
+

@@ -8,27 +8,27 @@
 {% block body %}
 <div class="container">
 
-  <!-- Painel esquerdo: Formulário de abertura -->
+  <!-- Painel esquerdo: Formulário Abrir/Editar OS -->
   <div class="panel abrir-os">
     <h2>Abrir OS</h2>
 
     <form method="post" action="{% url 'abrir_os' %}">
       {% csrf_token %}
 
+      <!-- Número da OS -->
       <div class="form-group">
         <label for="numero_os">Número da OS</label>
         <input type="text" id="numero_os" name="numero_os"
                value="{{ proximo_numero }}" readonly class="input-field">
       </div>
 
+      <!-- Centro de custo -->
       <div class="form-group">
         <label for="centro_custo">Centro de Custo</label>
-
         <div class="dropdown-container">
           <div id="dropdownSelected" class="dropdown-selected" tabindex="0">
             {% if selected_centro_label %}{{ selected_centro_label }}{% else %}Selecione um centro de custo{% endif %}
           </div>
-
           <div id="dropdownList" class="dropdown-list hidden" role="listbox" aria-hidden="true">
             {% for pai in pais_centro_custo %}
               <div class="dropdown-group">
@@ -46,31 +46,30 @@
               </div>
             {% endfor %}
           </div>
-
           <input type="hidden" name="centro_custo" id="centro_custo" value="{{ form.initial.centro_custo|default:'' }}">
         </div>
-        {% if form.errors.centro_custo %}
-          <div class="field-error">{{ form.errors.centro_custo }}</div>
-        {% endif %}
       </div>
 
+      <!-- Campos do formulário -->
       {% for field in form %}
-        {% if field.name != "situacao" and field.name != "centro_custo" %}
+        {% if field.name != "centro_custo" %}
           <div class="form-group">
             {{ field.label_tag }}
             {{ field }}
-            {% if field.errors %}
-              <div class="field-error">{{ field.errors }}</div>
-            {% endif %}
           </div>
         {% endif %}
       {% endfor %}
 
-      <button type="submit" class="save-btn">💾 Abrir OS</button>
+      <!-- Botões -->
+      <div class="form-actions">
+        <button type="submit" class="save-btn">💾 Abrir OS</button>
+        <a href="#" class="delete-btn" style="display:none;">🗑️ Excluir OS</a>
+        <button type="button" class="cancel-btn" style="display:none;">↩️ Cancelar Edição</button>
+      </div>
     </form>
   </div>
 
-  <!-- Painel direito: tabela de OS abertas -->
+  <!-- Painel direito: Tabela de OS -->
   <div class="panel tabela-os">
     <h2>Ordens de Serviço</h2>
     <div class="os-table-container">
@@ -87,14 +86,24 @@
           </thead>
           <tbody>
             {% for o in ordens %}
-              <tr>
+              <tr data-os-id="{{ o.pk }}"
+                  data-numero-os="{{ o.numero_os }}"
+                  data-descricao_os="{{ o.descricao_os }}"
+                  data-cliente="{{ o.cliente.pk|stringformat:'s' }}"
+                  data-cliente-label="{{ o.cliente.nome }}"
+                  data-motivo_intervencao="{{ o.motivo_intervencao.pk|stringformat:'s' }}"
+                  data-motivo-label="{{ o.motivo_intervencao.descricao }}"
+                  data-ssm="{{ o.ssm }}"
+                  data-responsavel="{{ o.responsavel }}"
+                  data-prioridade="{{ o.prioridade }}"
+                  data-situacao="{{ o.situacao }}"
+                  data-centro-custo="{{ o.centro_custo.cod_centro }}"
+                  data-centro-label="{{ o.centro_custo.descricao }}">
                 <td>{{ o.numero_os }}</td>
                 <td>{{ o.descricao_os }}</td>
                 <td>{{ o.cliente }}</td>
                 <td>{{ o.get_situacao_display }}</td>
-                <td>
-                  <a href="{% url 'editar_os' o.pk %}" class="edit-btn" title="Editar OS">✏️</a>
-                </td>
+                <td><button class="edit-btn" type="button">✏️</button></td>
               </tr>
             {% endfor %}
           </tbody>
@@ -104,8 +113,99 @@
       {% endif %}
     </div>
   </div>
-
 </div>
 
 <script src="{% static 'js/abrir_os.js' %}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const formTitle = document.querySelector('.abrir-os h2');
+  const saveBtn = document.querySelector('.save-btn');
+  const form = document.querySelector('.abrir-os form');
+  const numeroOS = document.getElementById('numero_os');
+  const hiddenInput = document.getElementById('centro_custo');
+  const selected = document.getElementById('dropdownSelected');
+  const deleteBtn = document.querySelector('.delete-btn');
+  const cancelBtn = document.querySelector('.cancel-btn');
+
+  // === Função: preencher formulário para edição ===
+  function preencherFormulario(osData) {
+    formTitle.textContent = 'Editar OS';
+    saveBtn.textContent = '💾 Salvar Alterações';
+    numeroOS.value = osData.numero;
+    hiddenInput.value = osData.centroCod;
+    selected.textContent = osData.centroLabel;
+    form.action = `/lancamento/editar_os/${osData.id}/`;
+    deleteBtn.href = `/lancamento/excluir/${osData.id}/`;
+    deleteBtn.style.display = 'inline-block';
+    cancelBtn.style.display = 'inline-block';
+
+    // Preenche os campos do form
+    for (const [key, value] of Object.entries(osData.campos)) {
+      const input = form.querySelector(`[name="${key}"]`);
+      if (!input) continue;
+
+      if (input.tagName === 'SELECT') {
+        input.value = value.toString();
+      } else if (input.type === 'checkbox') {
+        input.checked = Boolean(value);
+      } else {
+        input.value = value;
+      }
+    }
+
+    // Ajuste específico: selects cliente e motivo
+    const clienteSelect = form.querySelector('select[name="cliente"]');
+    const motivoSelect = form.querySelector('select[name="motivo_intervencao"]');
+    if (clienteSelect) clienteSelect.value = osData.campos.cliente.toString();
+    if (motivoSelect) motivoSelect.value = osData.campos.motivo_intervencao.toString();
+  }
+
+  // === Função: cancelar edição ===
+  cancelBtn.addEventListener('click', () => {
+    formTitle.textContent = 'Abrir OS';
+    saveBtn.textContent = '💾 Abrir OS';
+    numeroOS.value = '{{ proximo_numero }}';
+    hiddenInput.value = '';
+    selected.textContent = 'Selecione um centro de custo';
+    form.action = '{% url "abrir_os" %}';
+    deleteBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
+    form.reset();
+  });
+
+  // === Botão editar ===
+  document.querySelectorAll('.os-table tbody .edit-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const tr = e.target.closest('tr');
+      const osData = {
+        id: tr.dataset.osId,
+        numero: tr.dataset.numeroOs,
+        centroCod: tr.dataset.centroCusto,
+        centroLabel: tr.dataset.centroLabel,
+        campos: {
+          descricao_os: tr.dataset.descricao_os,
+          cliente: tr.dataset.cliente,
+          motivo_intervencao: tr.dataset.motivo_intervencao,
+          ssm: tr.dataset.ssm,
+          responsavel: tr.dataset.responsavel,
+          prioridade: tr.dataset.prioridade,
+          situacao: tr.dataset.situacao
+        }
+      };
+      preencherFormulario(osData);
+    });
+  });
+
+  // === Botão excluir com confirmação ===
+  deleteBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (confirm("Tem certeza que deseja excluir esta OS?") && deleteBtn.href) {
+      window.location.href = deleteBtn.href;
+    }
+  });
+
+});
+</script>
+
 {% endblock %}
