@@ -87,3 +87,9 @@ def get_subcentros(request):
     filhos = CentroCusto.objects.filter(centro_pai_id=pai_id).order_by('descricao')
     data = [{"id": f.cod_centro, "descricao": f.descricao} for f in filhos]
     return JsonResponse(data, safe=False)
+
+
+
+# --- Folha de Impressão de OS ---
+def imprimir_os (request):
+    return render (request, 'impressao_os/impressao.html')

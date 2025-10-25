@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordem de Serviço - {{ proximo_numero }}</title>
+    <link rel="stylesheet" href="{% static 'css/impressao.css' %}">
+</head>
+<body>
+    <div class="os-container">
+        <header class="os-header">
+            <div class="empresa-info">
+                <h2>ORDEM DE SERVIÇO - {{ os.numero_os }}</h2>
+            </div>
+            <div class="empresa-logo">
+                <img src="{% static 'img/tevere_logo.png' %}" alt="Logo Tevere">
+            </div>
+        </header>
+
+        <section class="os-info">
+            <div><strong>Nº da Solicitação:</strong> {{ os.numero_solicitacao }}</div>
+            <div><strong>Solicitante:</strong> {{ os.solicitante }}</div>
+            <div><strong>Centro Custo:</strong> {{ os.centro_custo }}</div>
+            <div><strong>Equipamento:</strong> {{ os.equipamento }}</div>
+            <div><strong>TAG:</strong> {{ os.tag }}</div>
+            <div><strong>Setor:</strong> {{ os.setor }}</div>
+            <div><strong>Data Solicitação:</strong> {{ os.data_solicitacao }}</div>
+            <div><strong>Hora:</strong> {{ os.hora_solicitacao }}</div>
+            <div class="situacao_equipamento">
+                <strong>Situação do Equipamento:</strong>
+                <select name="situacao" id="situacao" class="select-situacao">
+                    <option value="MAQUINA PARADA" {% if os.situacao == "MAQUINA PARADA" %}selected{% endif %}>MAQUINA PARADA</option>
+                    <option value="OPERANDO COM DEFEITO" {% if os.situacao == "OPERANDO COM DEFEITO" %}selected{% endif %}>OPERANDO COM DEFEITO</option>
+                    <option value="OPERANDO PROGRAMADA" {% if os.situacao == "OPERANDO PROGRAMADA" %}selected{% endif %}>OPERANDO PROGRAMADA</option>
+                    <option value="MAQUINA PARADA MELHORIA" {% if os.situacao == "MAQUINA PARADA MELHORIA" %}selected{% endif %}>MAQUINA PARADA MELHORIA</option>
+                    <option value="OPERANDO MELHORIA" {% if os.situacao == "OPERANDO MELHORIA" %}selected{% endif %}>OPERANDO MELHORIA</option>
+                    <option value="OUTROS" {% if os.situacao == "OUTROS" %}selected{% endif %}>OUTROS</option>
+                </select>
+            </div>
+            <div><strong>Motivo da Intervenção:</strong> {{ os.motivo }}</div>
+        </section>
+
+        <section class="os-descricao">
+            <h3>Descrição da Solicitação</h3>
+            <p>{{ os.descricao_solicitacao }}</p>
+        </section>
+
+        <section class="os-descricao">
+            <h3>Descrição da Ordem (IMA)</h3>
+            <p>{{ os.descricao_ordem }}</p>
+        </section>
+
+        <section class="os-descricao manual-area">
+            <h3>Descrição Técnica da Avaria</h3>
+            <div class="linha"></div>
+            <div class="linha"></div>
+            <div class="linha"></div>
+        </section>
+
+        <section class="os-descricao manual-area">
+            <h3>Descrição da Intervenção</h3>
+            <div class="linha"></div>
+            <div class="linha"></div>
+            <div class="linha"></div>
+        </section>
+
+        <section class="os-pecas manual-area">
+            <h3>Peças Aplicadas</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Quantidade</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td></td><td></td></tr>
+                    <tr><td></td><td></td></tr>
+                    <tr><td></td><td></td></tr>
+                    <tr><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="os-detalhes manual-area">
+            <div><strong>Cód. Sintoma:</strong> ____________________________</div>
+            <div><strong>Cód. Causa:</strong> ____________________________</div>
+            <div><strong>Cód. Intervenção:</strong> ____________________________</div>
+        </section>
+
+        <section class="os-tempo manual-area">
+            <div><strong>Data Início:</strong> ____/____/______</div>
+            <div><strong>Hora Início:</strong> ________</div>
+            <div><strong>Data Fim:</strong> ____/____/______</div>
+            <div><strong>Hora Fim:</strong> ________</div>
+        </section>
+
+        <section class="os-responsavel manual-area">
+            <div><strong>Responsável:</strong> ____________________________</div>
+            <div><strong>Visto Solicitante:</strong> ____________________________</div>
+        </section>
+
+        <section class="os-observacoes manual-area">
+            <h3>Observações</h3>
+            <div class="linha"></div>
+            <div class="linha"></div>
+            <div class="linha"></div>
+        </section>
+
+        <footer>
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+        </footer>
+    </div>
+</body>
+</html>
