@@ -109,6 +109,11 @@ body {
     padding-bottom: 5px;
     border-bottom: 1px solid #ccc;
 }
+.destaque {
+    font-weight: 700;       
+    font-size: 1.2em;        
+    color: #1a1a1a;          
+}
 
 .situacao_equipamento {
     display: flex;
@@ -151,6 +156,10 @@ select {
     line-height: 1.3;
 }
 
+.descricao{
+    font-weight: bolder;
+    color: #1a1a1a;
+}
 /* ===========================
    TABELA DE PEÇAS
    =========================== */
@@ -173,6 +182,10 @@ select {
 .os-pecas th {
     background-color: #eaeaea;
     font-weight: bold;
+}
+
+.os-pecas .quantidade{
+    width: 60px;
 }
 
 /* ===========================
@@ -228,3 +241,5 @@ footer {
 .btn-print:hover {
     background-color: #1f4db5;
 }
+
+

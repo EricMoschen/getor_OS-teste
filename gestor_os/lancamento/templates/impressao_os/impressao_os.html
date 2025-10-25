@@ -11,7 +11,7 @@
     <div class="os-container">
         <header class="os-header">
             <div class="empresa-info">
-                <h2>ORDEM DE SERVIÇO - {{ os.numero_os }}</h2>
+                <h2>ORDEM DE SERVIÇO - <span class="destaque">{{ os.numero_os }}</span></h2>
             </div>
             <div class="empresa-logo">
                 <img src="{% static 'img/tevere_logo.png' %}" alt="Logo Tevere">
@@ -19,36 +19,37 @@
         </header>
 
         <section class="os-info">
-            <div><strong>Nº da Solicitação:</strong> {{ os.numero_solicitacao }}</div>
-            <div><strong>Solicitante:</strong> {{ os.solicitante }}</div>
-            <div><strong>Centro Custo:</strong> {{ os.centro_custo }}</div>
-            <div><strong>Equipamento:</strong> {{ os.equipamento }}</div>
-            <div><strong>TAG:</strong> {{ os.tag }}</div>
-            <div><strong>Setor:</strong> {{ os.setor }}</div>
-            <div><strong>Data Solicitação:</strong> {{ os.data_solicitacao }}</div>
-            <div><strong>Hora:</strong> {{ os.hora_solicitacao }}</div>
+            <div><strong>Nº da Solicitação:</strong> <span class="destaque">{{ os.ssm }}</span></div>
+            <div><strong>Solicitante:</strong> <span class="destaque">{{ os.username }}</span></div>
+            <div><strong>Centro Custo:</strong> <span class="destaque">{{ os.centro_custo.cod_centro }}</span></div>
+            <div><strong>Equipamento:</strong> <span class="destaque">{{ os.centro_custo.descricao }}</span></div>
+            <div><strong>TAG:</strong> <span class="destaque">{{ os.centro_custo }}</span></div>
+            <div><strong>Setor:</strong> <span class="destaque">{{ os.setor }}</span></div>
+            <div><strong>Data Solicitação:</strong> <span class="destaque">{{ os.data_abertura|date:"d/m/Y" }}</span></div>
+            <div><strong>Hora:</strong> <span class="destaque">{{ os.data_abertura|date:"H:i" }}</span></div>
             <div class="situacao_equipamento">
                 <strong>Situação do Equipamento:</strong>
-                <select name="situacao" id="situacao" class="select-situacao">
-                    <option value="MAQUINA PARADA" {% if os.situacao == "MAQUINA PARADA" %}selected{% endif %}>MAQUINA PARADA</option>
-                    <option value="OPERANDO COM DEFEITO" {% if os.situacao == "OPERANDO COM DEFEITO" %}selected{% endif %}>OPERANDO COM DEFEITO</option>
-                    <option value="OPERANDO PROGRAMADA" {% if os.situacao == "OPERANDO PROGRAMADA" %}selected{% endif %}>OPERANDO PROGRAMADA</option>
-                    <option value="MAQUINA PARADA MELHORIA" {% if os.situacao == "MAQUINA PARADA MELHORIA" %}selected{% endif %}>MAQUINA PARADA MELHORIA</option>
-                    <option value="OPERANDO MELHORIA" {% if os.situacao == "OPERANDO MELHORIA" %}selected{% endif %}>OPERANDO MELHORIA</option>
-                    <option value="OUTROS" {% if os.situacao == "OUTROS" %}selected{% endif %}>OUTROS</option>
+                <select name="situacao" id="situacao" class="select-situacao destaque">
+                    <option value="INICIAL" {% if os.situacao == "INICIAL" %}selected{% endif %}>------------------------------</option>
+                    <option value="MAQUINA PARADA" {% if os.situacao == "MAQUINA PARADA" %}selected{% endif %}>Máquina Parada</option>
+                    <option value="OPERANDO COM DEFEITO" {% if os.situacao == "OPERANDO COM DEFEITO" %}selected{% endif %}>Operando Com Defeito </option>
+                    <option value="OPERANDO PROGRAMADA" {% if os.situacao == "OPERANDO PROGRAMADA" %}selected{% endif %}>Operando Programada</option>
+                    <option value="MAQUINA PARADA MELHORIA" {% if os.situacao == "MAQUINA PARADA MELHORIA" %}selected{% endif %}>Máquina Parada Melhoria</option>
+                    <option value="OPERANDO MELHORIA" {% if os.situacao == "OPERANDO MELHORIA" %}selected{% endif %}>Operando Melhoria</option>
+                    <option value="OUTROS" {% if os.situacao == "OUTROS" %}selected{% endif %}>Outros</option>
                 </select>
             </div>
-            <div><strong>Motivo da Intervenção:</strong> {{ os.motivo }}</div>
+            <div><strong>Motivo da Intervenção:</strong> <span class="destaque">{{ os.motivo_intervencao }}</span></div>
         </section>
 
         <section class="os-descricao">
             <h3>Descrição da Solicitação</h3>
-            <p>{{ os.descricao_solicitacao }}</p>
+            <p class="descricao">{{ os.descricao_solicitacao }}</p>
         </section>
 
         <section class="os-descricao">
             <h3>Descrição da Ordem (IMA)</h3>
-            <p>{{ os.descricao_ordem }}</p>
+            <p class="descricao">{{ os.descricao_os }}</p>
         </section>
 
         <section class="os-descricao manual-area">
@@ -70,15 +71,17 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Quantidade</th>
-                        <th>Descrição</th>
+                        <th class="quantidade">Quantidade</th>
+                        <th class="descricao">Descrição</th>
+                        <th class="quantidade">Quantidade</th>
+                        <th class="descricao">Descrição</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td></td><td></td></tr>
-                    <tr><td></td><td></td></tr>
-                    <tr><td></td><td></td></tr>
-                    <tr><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td><td></td></tr>
                 </tbody>
             </table>
         </section>

@@ -8,5 +8,5 @@ urlpatterns = [
     path('get_subcentros/', views.get_subcentros, name='get_subcentros'),
 
     # impressão de OS
-    path('impressao/', views.imprimir_os, name='imprimir_os'),
+    path('imprimir_os/<int:pk>/', views.imprimir_os, name='imprimir_os'),
 ]

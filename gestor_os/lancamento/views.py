@@ -91,5 +91,14 @@ def get_subcentros(request):
 
 
 # --- Folha de Impressão de OS ---
-def imprimir_os (request):
-    return render (request, 'impressao_os/impressao.html')
+def imprimir_os(request, pk):
+    """
+    Exibe a página de impressão da OS selecionada.
+    """
+    os = get_object_or_404(AberturaOS, pk=pk)
+
+    # Montando o contexto para preencher o template
+    context = {
+        'os': os,
+    }
+    return render(request, 'impressao_os/impressao_os.html', context)

@@ -103,7 +103,10 @@
                 <td>{{ o.descricao_os }}</td>
                 <td>{{ o.cliente }}</td>
                 <td>{{ o.get_situacao_display }}</td>
-                <td><button class="edit-btn" type="button">✏️</button></td>
+                <td>
+                  <button class="edit-btn" type="button">✏️</button>
+                  <a href="{% url 'imprimir_os' o.pk %}" target="_blank" class="print-btn">🖨️</a>
+                </td>
               </tr>
             {% endfor %}
           </tbody>
