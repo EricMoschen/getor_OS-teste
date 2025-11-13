@@ -9,4 +9,9 @@ urlpatterns = [
 
     # impressão de OS
     path('imprimir_os/<int:pk>/', views.imprimir_os, name='imprimir_os'),
+
+    # apontamento de horas
+    path("apontar_horas/", views.apontar_horas, name="apontar_horas"),
+    path("api/colaborador/<str:matricula>/", views.api_colaborador, name="api_colaborador"),
+    path("api/os/<str:numero>/", views.api_os, name="api_os"),
 ]

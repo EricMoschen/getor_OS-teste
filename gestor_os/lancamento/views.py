@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from .models import AberturaOS
+from .models import ApontamentoHoras, Colaborador, AberturaOS
 from cadastro.models import CentroCusto
 from .forms import AberturaOSForm
+from django.utils import timezone 
+from django.contrib import messages  
+
 
 # Função auxiliar — retorna apenas os centros de custo "pais"
 def get_pais_centro_custo():
@@ -102,3 +105,81 @@ def imprimir_os(request, pk):
         'os': os,
     }
     return render(request, 'impressao_os/impressao_os.html', context)
+
+
+
+# =====================================================
+# View: apontar_horas
+# =====================================================
+
+
+def apontar_horas(request):
+    if request.method == "POST":
+        matricula = request.POST.get("matricula", "").strip().upper()
+        numero_os = request.POST.get("numero_os")
+        acao = request.POST.get("acao")
+
+        colaborador = get_object_or_404(
+            Colaborador.objects.only("id", "turno", "hr_saida_pm", "matricula", "nome"),
+            matricula__iexact=matricula
+        )
+        os_obj = get_object_or_404(
+            AberturaOS.objects.only("id", "numero_os"),
+            numero_os=numero_os
+        )
+
+        if acao == "iniciar":
+            ApontamentoHoras.encerrar_aberto(colaborador)
+            ApontamentoHoras.objects.create(
+                colaborador=colaborador,
+                ordem_servico=os_obj,
+                data_inicio=timezone.now()
+            )
+            messages.success(request, f"Início da OS {os_obj.numero_os} registrado com sucesso.")
+
+        elif acao == "finalizar":
+            aberto = ApontamentoHoras.objects.filter(
+                colaborador=colaborador,
+                data_fim__isnull=True
+            ).order_by('-data_inicio').first()
+
+            if aberto:
+                aberto.data_fim = timezone.now()
+                aberto.save(update_fields=['data_fim'])
+                messages.success(request, f"OS {aberto.ordem_servico.numero_os} finalizada.")
+            else:
+                messages.warning(request, "Nenhuma OS em andamento para este colaborador.")
+
+        return redirect("apontar_horas")
+
+    # GET → exibir tela
+    ordens = AberturaOS.objects.select_related("centro_custo", "cliente").only(
+        "numero_os", "descricao_os", "centro_custo__descricao", "cliente__nome_cliente"
+    )
+
+    return render(request, "apontar_horas/apontar_horas.html", {"ordens": ordens})
+
+def api_colaborador(request, matricula):
+    try:
+        colaborador = Colaborador.objects.get(matricula__iexact=matricula)
+        return JsonResponse({
+            "id": colaborador.id,
+            "matricula": colaborador.matricula,
+            "nome": colaborador.nome,
+            "funcao": colaborador.funcao,
+            "turno": colaborador.turno,
+        })
+    except Colaborador.DoesNotExist:
+        raise Http404("Colaborador não encontrado")
+
+
+def api_os(request, numero):
+    try:
+        os_obj = AberturaOS.objects.get(numero_os__iexact=numero)
+        return JsonResponse({
+            "id": os_obj.id,
+            "numero_os": os_obj.numero_os,
+            "descricao": os_obj.descricao_os,
+        })
+    except AberturaOS.DoesNotExist:
+        raise Http404("OS não encontrada")
