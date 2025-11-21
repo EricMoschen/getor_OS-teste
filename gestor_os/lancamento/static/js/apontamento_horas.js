@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        const resp = await fetch(`/api/colaborador/${matricula}/`);
+        const resp = await fetch(`/lancamento/api/colaborador/${matricula}/`);
         if (!resp.ok) throw new Error();
         const data = await resp.json();
         nomeInput.value = data.nome || "Colaborador não encontrado";
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        const resp = await fetch(`/api/os/${numero}/`);
+        const resp = await fetch(`/lancamento/api/os/${numero}/`);
         if (!resp.ok) throw new Error();
         const data = await resp.json();
         descricaoInput.value = data.descricao || "OS não encontrada";

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Colaborador, AberturaOS, CentroCusto, Cliente, Intervencao
+from .models import Colaborador, AberturaOS, CentroCusto, Cliente, Intervencao, ApontamentoHoras
 
 
 @admin.register(Colaborador)
@@ -22,4 +22,8 @@ class CentroCustoAdmin(admin.ModelAdmin):
     list_display = ("descricao",)
     search_fields = ("descricao",)
 
-
+# Caso esses modelos existam e você queira administrá-los também:
+@admin.register(ApontamentoHoras)
+class ApontamentoHorasAdmin(admin.ModelAdmin):
+    list_display = ("colaborador", "ordem_servico", "data_inicio", "data_fim")
+    search_fields = ("colaborador__nome", "ordem_servico__descricao", "data_inicio", "data_fim")

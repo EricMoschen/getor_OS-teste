@@ -5,5 +5,3 @@ Erro "Erro no apontamento de Horas Extras"
 - fazer intefaçe para o enceramento das Os finalizadas, uso do PCM 
 
 - Tela com Grafana das 20 ultimas OS abertas em tempo real, para visualização 
-
-- 

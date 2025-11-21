@@ -1,0 +1,170 @@
+================================================================================================================
+    Introdução  
+================================================================================================================
+
+ O Gestor OS é um sistema web desenvolvido para gerenciar todo o fluxo de Abertura de Ordens de Serviço (OS)
+e o Apontamento de Horas dos colaboradores, proporcionando maior controle operacional e financeiro para a 
+empresa.
+
+O sistema permite o cadastro e gerenciamento dos principais elementos envolvidos no processo de prestação
+de serviços, incluindo:
+
+Clientes: onde os serviços serão executados.
+
+Centros de Custo: utilizados para organizar e direcionar as despesas de cada OS dentro da estrutura da 
+empresa.
+
+Intervenções: classificações que definem o tipo da OS (ex.: Manutenção Preventiva, Manutenção Corretiva,
+Melhoria), auxiliando na análise e identificação dos serviços mais demandados.
+
+Colaboradores: registrando dados como matrícula, turno de trabalho, setor e valor da hora, possibilitando 
+o cálculo detalhado dos custos de mão de obra por OS.
+
+O objetivo do Gestor OS é oferecer uma plataforma prática, organizada e eficiente para registrar,
+acompanhar e analisar todas as atividades relacionadas às Ordens de Serviço, garantindo maior precisão 
+nos controles e mais agilidade nos processos internos.
+
+
+================================================================================================================
+    Tecnologias Utilizadas 
+================================================================================================================
+
+================
+    Linguagens:
+================
+
+Python 3.12 – Linguagem principal utilizada no backend.
+
+JavaScript – Utilizado para interações dinâmicas, validações, AJAX e UX.
+
+HTML5 / CSS3 – Estrutura e estilização das páginas.
+
+
+======================================
+Frameworks e Bibliotecas Principais
+======================================
+
+Django 5.2.7
+Framework principal para criação da aplicação web, gerenciamento de rotas, autenticação, ORM e estrutura MVC.
+
+Jinja2
+Motor de templates utilizado internamente pelo Django para renderização das páginas.
+
+TailwindCSS 
+Utilizado para estilização moderna, responsiva e produtividade no front-end.
+
+Requests / Httpx
+Utilizados para requisições HTTP quando necessário.
+
+Argon2-cffi
+Biblioteca usada para hashing de senhas com alto nível de segurança.
+
+Pillow
+Utilizada para manipulação de imagens, quando aplicável.
+
+================
+Banco de Dados
+================
+
+SQLite (ambiente de desenvolvimento)
+Banco de dados padrão do Django, simples e eficiente para desenvolvimento.
+
+PostgreSQL (se usado em produção)
+Recomendado para ambiente de produção devido à performance e robustez.
+
+=======================
+Ferramentas e Ambiente
+=======================
+
+Virtualenv (venv)
+Ambiente isolado para gerenciamento das dependências do projeto.
+
+pip + requirements.txt
+Gerenciamento de pacotes e replicação de ambiente.
+
+Git & GitHub
+Versionamento de código e colaboração.
+
+JupyterLab / Notebook (opcional)
+Utilizado para testes, análises ou desenvolvimento auxiliar.
+
+====================================
+Dependências Auxiliares do Projeto
+====================================
+
+O projeto utiliza algumas bibliotecas adicionais presentes em requirements.txt, entre elas:
+
+Django Extensions, Jsonschema, Bleach, BeautifulSoup4, Pandas, NumPy, entre outras que auxiliam no 
+funcionamento e compatibilidade geral do sistema.
+
+
+
+================================================================================================================
+    Estrutura
+================================================================================================================
+
+
+/Gestor_OS/
+    - cadastro
+        - static
+            - css
+                - cadastro_cliente.css
+                - cadastro_colaborador.css
+                - cadasto_intervencao.css
+                - cadastro_centro_custo.css
+            - js
+                - cadastro_cliente.js
+                - cadastro_colaborador.js
+                - cadasto_intervencoes.js
+                - alternar_arvore_centro_custo.js
+        - template
+            - cadastro_centro
+                - cadastro_centro_custo.html
+                - subcentros.html
+            - cadastro_cliente
+                - cadastro_cliente.html
+            - cadastro_colaborador
+                - cadastro_colaborador.html
+            - cadasto_intervencao
+                - cadasto_intervencao.html
+            - forms.py
+            - models.py
+            - urls.py
+            - views.py
+    - Gestor_OS
+        - settings.py
+        - urls.py
+    - lancamento
+        - static
+            - css
+                - abrir_os.css
+                - apontar_horas.css
+                - impressao.css
+            - img
+                - logo_impresa.png
+            - js
+                - abrir_os.js
+                - apontamento_horas.js
+        - templates
+            - abertura_os
+                - abertura_os.html
+            - apontar_horas
+                - apontar_horas.html
+            - impressao_os
+                -impressao_os.html
+        - forms.py
+        - models.py
+        - urls.py
+        - views.py
+    - menu
+        - static
+            - css
+                - dashboard.css
+        - templates
+            - menu
+                - deshboard.html
+        - urls.py
+        - views.py
+    - templates
+        - base.html
+    - manage.py
