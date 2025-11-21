@@ -168,3 +168,4 @@ funcionamento e compatibilidade geral do sistema.
     - templates
         - base.html
     - manage.py
+    - requirements.txt
