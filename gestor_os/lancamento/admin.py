@@ -4,7 +4,7 @@ from .models import Colaborador, AberturaOS, CentroCusto, Cliente, Intervencao, 
 
 @admin.register(Colaborador)
 class ColaboradorAdmin(admin.ModelAdmin):
-    list_display = ("matricula", "nome", "funcao", "turno")
+    list_display = ("matricula", "nome", "funcao", "turno",)
     search_fields = ("matricula", "nome")
     list_filter = ("turno",)
 
@@ -25,5 +25,5 @@ class CentroCustoAdmin(admin.ModelAdmin):
 # Caso esses modelos existam e você queira administrá-los também:
 @admin.register(ApontamentoHoras)
 class ApontamentoHorasAdmin(admin.ModelAdmin):
-    list_display = ("colaborador", "ordem_servico", "data_inicio", "data_fim")
+    list_display = ("colaborador", "ordem_servico", "data_inicio", "data_fim" , "tipo_dia")
     search_fields = ("colaborador__nome", "ordem_servico__descricao", "data_inicio", "data_fim")

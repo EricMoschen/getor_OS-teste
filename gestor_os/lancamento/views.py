@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from .models import ApontamentoHoras, Colaborador, AberturaOS
 from cadastro.models import CentroCusto
 from .forms import AberturaOSForm
 from django.utils import timezone 
 from django.contrib import messages  
+from datetime import time, datetime
+import holidays
 
 
 # Função auxiliar — retorna apenas os centros de custo "pais"
@@ -113,27 +115,76 @@ def imprimir_os(request, pk):
 # =====================================================
 
 
+BR_HOLIDAYS = holidays.Brazil()  # Para verificar feriados
+
 def apontar_horas(request):
     if request.method == "POST":
         matricula = request.POST.get("matricula", "").strip().upper()
         numero_os = request.POST.get("numero_os")
         acao = request.POST.get("acao")
 
+        # Busca colaborador e OS
         colaborador = get_object_or_404(
-            Colaborador.objects.only("id", "turno", "hr_saida_pm", "matricula", "nome"),
+            Colaborador.objects.only(
+                "id", "turno", "hr_entrada_am", "hr_saida_am",
+                "hr_entrada_pm", "hr_saida_pm", "matricula", "nome"
+            ),
             matricula__iexact=matricula
         )
+
         os_obj = get_object_or_404(
             AberturaOS.objects.only("id", "numero_os"),
             numero_os=numero_os
         )
 
+        agora = timezone.localtime()
+
         if acao == "iniciar":
-            ApontamentoHoras.encerrar_aberto(colaborador)
+            # Verifica OS em aberto
+            aberto = ApontamentoHoras.objects.filter(
+                colaborador=colaborador,
+                data_fim__isnull=True
+            ).order_by('-data_inicio').first()
+
+            if aberto:
+                data_aberto = timezone.localtime(aberto.data_inicio).date()
+                data_hoje = agora.date()
+
+                hr_inicio_turno = colaborador.calcular_horario_inicio_turno()
+                hr_fim_turno = colaborador.calcular_horario_fim_turno()
+                dentro_turno = hr_inicio_turno <= agora.time() <= hr_fim_turno
+
+                # Se OS anterior não for do mesmo dia e não estiver dentro do turno → erro
+                if data_aberto != data_hoje and not dentro_turno:
+                    messages.error(
+                        request,
+                        f"Erro de Hora Extra! A OS {aberto.ordem_servico.numero_os} - "
+                        f"{colaborador.matricula} - {colaborador.nome} está em aberto. "
+                        "Encerre-a antes de iniciar nova OS."
+                    )
+                    return redirect("apontar_horas")
+                else:
+                    # Encerra OS aberta
+                    try:
+                        ApontamentoHoras.encerrar_aberto(colaborador)
+                    except ValueError as e:
+                        messages.error(request, str(e))
+                        return redirect("apontar_horas")
+
+            # Classifica tipo de dia
+            if agora.weekday() == 6:
+                tipo_dia = "Dom/Feriado"
+            elif agora.weekday() == 5:
+                tipo_dia = "Sábado"
+            else:
+                tipo_dia = "Dia Normal"
+
+            # Cria novo apontamento
             ApontamentoHoras.objects.create(
                 colaborador=colaborador,
                 ordem_servico=os_obj,
-                data_inicio=timezone.now()
+                data_inicio=agora,
+                tipo_dia=tipo_dia
             )
             messages.success(request, f"Início da OS {os_obj.numero_os} registrado com sucesso.")
 
@@ -144,7 +195,10 @@ def apontar_horas(request):
             ).order_by('-data_inicio').first()
 
             if aberto:
-                aberto.data_fim = timezone.now()
+                if aberto.data_inicio > agora:
+                    messages.error(request, "Erro! Horário de início maior que horário de fim.")
+                    return redirect("apontar_horas")
+                aberto.data_fim = agora
                 aberto.save(update_fields=['data_fim'])
                 messages.success(request, f"OS {aberto.ordem_servico.numero_os} finalizada.")
             else:
@@ -159,6 +213,10 @@ def apontar_horas(request):
 
     return render(request, "apontar_horas/apontar_horas.html", {"ordens": ordens})
 
+
+# =============================
+# APIs auxiliares
+# =============================
 def api_colaborador(request, matricula):
     try:
         colaborador = Colaborador.objects.get(matricula__iexact=matricula)

@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import time
 
 
 # =====================================================
@@ -51,8 +52,7 @@ class Intervencao(models.Model):
 # =====================================================
 # Model para Cadastro do Colaborador
 # =====================================================
-
-class  Colaborador(models.Model):
+class Colaborador(models.Model):
     
     TURNO_OPCOES = [
         ('A', 'A - 07:00 às 11:00 / 12:00 às 16:48'),
@@ -61,18 +61,18 @@ class  Colaborador(models.Model):
         ('OUTROS', 'Outros'),
     ]
     
+    matricula = models.CharField(max_length=4, unique=True, verbose_name='Número da Matrícula')
+    nome = models.CharField(max_length=255, verbose_name='Nome do Colaborador')
+    funcao = models.CharField(max_length=150, verbose_name='Função')
+    valor_hora = models.DecimalField(max_digits=7, decimal_places=2, default=0.00, verbose_name='Valor da Hora (R$)')
+    turno = models.CharField(max_length=10, choices=TURNO_OPCOES, verbose_name='Turno')
     
-    matricula = models.CharField(max_length = 4, unique= True, verbose_name= 'Número da Mátricula')
-    nome = models.CharField(max_length= 255, verbose_name= 'Nome do Colaborador')
-    funcao = models.CharField(max_length= 150, verbose_name= 'Função')
-    valor_hora = models.DecimalField(max_digits= 7, decimal_places= 2, default= 0.00, verbose_name= 'Valor da Hora (R$)')
-    turno = models.CharField(max_length= 10, choices= TURNO_OPCOES, verbose_name= 'Turno')
     
-    # Campos para horários persolanizados (quando turno for OUTROS)
-    hr_entrada_am = models.TimeField(blank= True, null= True, verbose_name= 'Entrada (Manhã)')
-    hr_saida_am = models.TimeField(blank= True, null= True, verbose_name= 'Saída (Manhã)')
-    hr_entrada_pm = models.TimeField(blank= True, null= True, verbose_name= 'Entrada (Tarde)')
-    hr_saida_pm = models.TimeField(blank= True, null= True, verbose_name= 'Saída (Tarde)')
+    # Campos para horários personalizados (quando turno for OUTROS)
+    hr_entrada_am = models.TimeField(blank=True, null=True, verbose_name='Entrada (Manhã)')
+    hr_saida_am = models.TimeField(blank=True, null=True, verbose_name='Saída (Manhã)')
+    hr_entrada_pm = models.TimeField(blank=True, null=True, verbose_name='Entrada (Tarde)')
+    hr_saida_pm = models.TimeField(blank=True, null=True, verbose_name='Saída (Tarde)')
     
     def __str__(self):
         return f"{self.matricula} - {self.nome}"
@@ -81,3 +81,30 @@ class  Colaborador(models.Model):
         verbose_name = "Colaborador"
         verbose_name_plural = "Colaboradores"
         ordering = ['nome']
+
+    # =====================================================
+    # Métodos para calcular horários do turno
+    # =====================================================
+    def calcular_horario_inicio_turno(self):
+        turno = self.turno
+        if turno == 'A':
+            return time(7, 0)
+        elif turno == 'B':
+            return time(16, 48)
+        elif turno == 'HC':
+            return time(8, 0)
+        elif turno == 'OUTROS':
+            return self.hr_entrada_am or time(7, 0)
+        return time(7, 0)
+
+    def calcular_horario_fim_turno(self):
+        turno = self.turno
+        if turno == 'A':
+            return time(16, 48)
+        elif turno == 'B':
+            return time(2, 0)
+        elif turno == 'HC':
+            return time(17, 48)
+        elif turno == 'OUTROS':
+            return self.hr_saida_pm or time(17, 48)
+        return time(17, 48)
