@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/cadastro_intervencao.css' %}">
+<link rel="stylesheet" href="{% static 'css/cadastro_cliente.css' %}">
 {% endblock head %}
 
 {% block body %}
@@ -11,46 +11,67 @@
     <!-- Painel esquerdo: formulário -->
     <div class="left-panel">
         <h2>Cadastro de Clientes</h2>
-
-        <form method="POST">
+            
+        <form method="POST" id="clienteForm">
             {% csrf_token %}
+
+            <!-- Campo oculto para editar -->
+            <input type="hidden" name="cliente_id" id="cliente_id">
+
             <label for="id_cod_cliente">Código do Cliente</label>
             <input type="number" name="cod_cliente" id="id_cod_cliente" required>
-            
+
             <label for="id_nome_cliente">Nome do Cliente</label>
             <input type="text" name="nome_cliente" id="id_nome_cliente" required>
 
-            <button type="submit">Cadastrar</button>
+            <button type="submit" id="submitBtn">Cadastrar</button>
+            <button type="submit" id="btnCancelar">Cancelar</button>
         </form>
+
+        <!-- Mensagem de erro de código Duplicado -->
+        {% if mensagem_erro %}
+        <div class="erro-msg" id="erro-msg">
+            {{ mensagem_erro|safe }}
+        </div>
+        {% endif %}
+
     </div>
 
     <!-- Painel direito: tabela de clientes -->
     <div class="right-panel">
         <h2>Clientes Cadastrados</h2>
-        {% if clientes %}
-        <table class="client-table">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Nome</th>
-                    <th>Excluir</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cliente in clientes %}
-                <tr>
-                    <td>{{ cliente.pk }}</td>
-                    <td>{{ cliente.nome_cliente }}</td>
-                    <td>
-                        <a href="#" class="delete-btn" data-id="{{ cliente.pk }}" data-nome="{{ cliente.nome_cliente }}">🗑️</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>Nenhum cliente cadastrado ainda.</p>
-        {% endif %}
+        <div class="table-container">
+            {% if clientes %}
+            <table class="client-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Editar</th>
+                        <th>Excluir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr>
+                        <td>{{ cliente.cod_cliente }}</td>
+                        <td>{{ cliente.nome_cliente }}</td>
+                        <td>
+                            <a href="#" class="edit-btn" data-id="{{ cliente.id }}" data-nome="{{ cliente.nome_cliente }}"
+                                data-cod="{{ cliente.cod_cliente }}">✏️</a>
+                        </td>
+                        <td>
+                            <a href="#" class="delete-btn" data-id="{{ cliente.pk }}"
+                                data-nome="{{ cliente.nome_cliente }}">🗑️</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>Nenhum cliente cadastrado ainda.</p>
+            {% endif %}
+        </div>
     </div>
 
 </div>
@@ -60,6 +81,7 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <p>Tem certeza que deseja excluir: <strong id="modalNome"></strong>?</p>
+        <br>
         <form id="deleteForm" method="POST">
             {% csrf_token %}
             <button type="submit" class="confirm-btn">Sim, excluir</button>
@@ -68,6 +90,5 @@
     </div>
 </div>
 
-<script src="{% static 'js/cadastro_cliente.js' %}"></script>
-
+<script src="{% static 'js/cadastro_clientes.js' %}"></script>
 {% endblock %}

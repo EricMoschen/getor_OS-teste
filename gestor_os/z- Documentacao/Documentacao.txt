@@ -169,3 +169,17 @@ funcionamento e compatibilidade geral do sistema.
         - base.html
     - manage.py
     - requirements.txt
+
+
+
+================================================================================================================
+    Cadastro de Clientes
+================================================================================================================
+
+O cadastro de cliente possibilita o cadastro dos clites que serão prestados serviços pela empresa , 
+eles possibilitam o controle de quais OS e apontamentos de horas para possamos ter o controle dos Materiais e horas para fatuara para cada cliente
+
+O cadastro se consiste em o codigo do cliente que deve ser unico e não se repitir para manter a indentidade de cada cliente
+o Nome / Razão social do cliente para facilitar a identificação de cada
+
+possibilita tambem a edição e exclusão de cadastros acesados pelos icone junto a lista de clientes cadastrados 

@@ -30,7 +30,8 @@ class CentroCusto(models.Model):
 
 class Cliente(models.Model):
     
-    cod_cliente = models.IntegerField(primary_key= True)
+    id = models.AutoField(primary_key=True)
+    cod_cliente = models.IntegerField(unique=True)
     nome_cliente = models.CharField(max_length= 100)
     
     def __str__(self):

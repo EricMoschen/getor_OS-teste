@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import CentroCustoForm, ClienteForm, IntervencaoForm, ColaboradorForm
 from .models import CentroCusto, Cliente, Intervencao, Colaborador
+from django.db.models import Q
 
 
 # =====================================================
@@ -39,22 +40,52 @@ def cadastrar_centro_custo(request):
 # =====================================================
 
 def cadastro_cliente(request):
+
+    mensagem_erro = None
+    
+
     if request.method == 'POST':
-        cod = request.POST.get('cod_cliente')
-        nome = request.POST.get('nome_cliente')
-        if cod and nome:
-            # Criar cliente usando o código informado pelo usuário
-            Cliente.objects.create(pk=cod, nome_cliente=nome)
+        cliente_id = request.POST.get("cliente_id") or None
+        cod = request.POST.get("cod_cliente")
+        nome = request.POST.get("nome_cliente")
+
+        # VERIFICACR SE O CÓDIGO JÁ EXISTE EM OUTRO CLIENTE
+        cliente_existente = Cliente.objects.filter(cod_cliente=cod).exclude(pk=cliente_id).first()
+
+        if Cliente.objects.filter(cod_cliente=cod).exclude(pk=cliente_id).exists():
+            mensagem_erro = f"Já existe um Cliente com o Código Informado: <br> {cod} - {cliente_existente.nome_cliente}."
+        else:
+        # EDITAR CLIENTE
+            if cliente_id:
+                cliente = Cliente.objects.get(pk=cliente_id)
+                cliente.cod_cliente = cod 
+                cliente.nome_cliente = nome
+                cliente.save()
+
+            # CADASTRAR NOVO CLIENTE
+            else:
+                Cliente.objects.create(
+                    cod_cliente=cod,
+                    nome_cliente=nome
+                )
+
             return redirect('cadastro_cliente')
 
-    clientes = Cliente.objects.all()
-    return render(request, 'cadastro_cliente/cadastro_cliente.html', {'clientes': clientes})
+    # LISTAR CLIENTES
+    clientes = Cliente.objects.all().order_by('cod_cliente')
+    return render(request, "cadastro_cliente/cadastro_cliente.html", {"clientes": clientes, "mensagem_erro":mensagem_erro})
+
 
 def excluir_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
+
     if request.method == 'POST':
         cliente.delete()
         return redirect('cadastro_cliente')
+
+    # opcional: retornar erro ou redirect
+    return redirect('cadastro_cliente')
+
 
 # =====================================================
 # Cadastro de Intervenções
