@@ -11,7 +11,7 @@
     <!-- Painel esquerdo: formulário -->
     <div class="left-panel">
         <h2>Cadastro de Clientes</h2>
-            
+
         <form method="POST" id="clienteForm">
             {% csrf_token %}
 
@@ -25,10 +25,9 @@
             <input type="text" name="nome_cliente" id="id_nome_cliente" required>
 
             <button type="submit" id="submitBtn">Cadastrar</button>
-            <button type="submit" id="btnCancelar">Cancelar</button>
+            <button type="button" id="btnCancelar">Cancelar</button>
         </form>
 
-        <!-- Mensagem de erro de código Duplicado -->
         {% if mensagem_erro %}
         <div class="erro-msg" id="erro-msg">
             {{ mensagem_erro|safe }}
@@ -39,7 +38,10 @@
 
     <!-- Painel direito: tabela de clientes -->
     <div class="right-panel">
-        <h2>Clientes Cadastrados</h2>
+        <div class="table-header">
+            <h2>Clientes Cadastrados</h2>
+        </div>
+
         <div class="table-container">
             {% if clientes %}
             <table class="client-table">
@@ -57,12 +59,10 @@
                         <td>{{ cliente.cod_cliente }}</td>
                         <td>{{ cliente.nome_cliente }}</td>
                         <td>
-                            <a href="#" class="edit-btn" data-id="{{ cliente.id }}" data-nome="{{ cliente.nome_cliente }}"
-                                data-cod="{{ cliente.cod_cliente }}">✏️</a>
+                            <a href="#" class="edit-btn" data-id="{{ cliente.id }}" data-nome="{{ cliente.nome_cliente }}" data-cod="{{ cliente.cod_cliente }}">✏️</a>
                         </td>
                         <td>
-                            <a href="#" class="delete-btn" data-id="{{ cliente.pk }}"
-                                data-nome="{{ cliente.nome_cliente }}">🗑️</a>
+                            <a href="#" class="delete-btn" data-id="{{ cliente.pk }}" data-nome="{{ cliente.nome_cliente }}">🗑️</a>
                         </td>
                     </tr>
                     {% endfor %}

@@ -92,19 +92,29 @@ def excluir_cliente(request, pk):
 # =====================================================
 def cadastro_intervencao(request):
     if request.method == 'POST':
+        interv_id = request.POST.get('intervencao_id')
         descricao = request.POST.get('descricao')
-        if descricao:
-            Intervencao.objects.create(descricao=descricao)
-            return redirect('cadastro_intervencao')
 
-    intervencoes = Intervencao.objects.all()
+        if descricao:
+            if interv_id:  # Editar
+                interv = get_object_or_404(Intervencao, cod_intervencao=interv_id)
+                interv.descricao = descricao
+                interv.save()
+            else:  # Criar
+                # Gera o próximo código automático
+                prox_cod = (Intervencao.objects.aggregate(max_cod=models.Max('cod_intervencao'))['max_cod'] or 0) + 1
+                Intervencao.objects.create(cod_intervencao=prox_cod, descricao=descricao)
+
+        return redirect('cadastro_intervencao')
+
+    intervencoes = Intervencao.objects.all().order_by('cod_intervencao')
     return render(request, 'cadastro_intervencao/cadastro_intervencao.html', {
         'intervencoes': intervencoes
     })
 
 def excluir_intervencao(request, pk):
-    intervencao = get_object_or_404(Intervencao, pk=pk)
-    intervencao.delete()
+    interv = get_object_or_404(Intervencao, pk=pk)
+    interv.delete()
     return redirect('cadastro_intervencao')
 
 # =====================================================

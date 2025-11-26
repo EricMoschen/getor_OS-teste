@@ -2,52 +2,61 @@
 {% load static %}
 
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/cadastro_intervencao.css' %}">
+<link rel="stylesheet" href="{% static 'css/cadastro_intervencoes.css' %}">
 {% endblock head %}
 
 {% block body %}
 <div class="container">
 
-    <!-- Painel esquerdo: formulário -->
     <div class="left-panel">
         <h2>Cadastro de Intervenções</h2>
 
-        <form method="POST">
+        <form method="POST" id="intervForm">
             {% csrf_token %}
-            <label for="id_descricao">Descrição da Intervenção</label>
-            <input type="text" name="descricao" id="id_descricao" required>
+            <input type="hidden" name="intervencao_id" id="intervId">
 
-            <button type="submit">Cadastrar</button>
+            <label for="descricaoInput">Descrição</label>
+            <input type="text" name="descricao" id="descricaoInput" required>
+
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button type="submit" id="submitBtn">Cadastrar</button>
+                <button type="button" id="cancelBtn" style="display:none;">Cancelar</button>
+            </div>
         </form>
     </div>
 
-    <!-- Painel direito: tabela de intervenções -->
     <div class="right-panel">
         <h2>Intervenções Cadastradas</h2>
-        {% if intervencoes %}
-        <table class="client-table">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Descrição</th>
-                    <th>Excluir</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for intervencao in intervencoes %}
-                <tr>
-                    <td>{{ intervencao.cod_intervencao }}</td>
-                    <td>{{ intervencao.descricao }}</td>
-                    <td>
-                        <a href="#" class="delete-btn" data-id="{{ intervencao.pk }}" data-nome="{{ intervencao.descricao }}">🗑️</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>Nenhuma intervenção cadastrada.</p>
-        {% endif %}
+        <div class="table-container">
+            {% if intervencoes %}
+            <table class="client-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descrição</th>
+                        <th>Editar</th>
+                        <th>Excluir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in intervencoes %}
+                    <tr>
+                        <td>{{ i.cod_intervencao }}</td>
+                        <td>{{ i.descricao }}</td>
+                        <td>
+                            <a href="#" class="edit-btn" data-id="{{ i.cod_intervencao }}" data-descricao="{{ i.descricao }}">✏️</a>
+                        </td>
+                        <td>
+                            <a href="#" class="delete-btn" data-id="{{ i.cod_intervencao }}" data-nome="{{ i.descricao }}">🗑️</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>Nenhuma intervenção cadastrada.</p>
+            {% endif %}
+        </div>
     </div>
 
 </div>
@@ -65,6 +74,5 @@
     </div>
 </div>
 
-<script src="{% static 'js/cadastro_intervencoes.js' %}"></script>
-
+<script src="{% static 'js/cadastro_intervencao.js' %}"></script>
 {% endblock %}
