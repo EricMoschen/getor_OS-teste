@@ -3,6 +3,7 @@ from django.contrib import messages
 from .forms import CentroCustoForm, ClienteForm, IntervencaoForm, ColaboradorForm
 from .models import CentroCusto, Cliente, Intervencao, Colaborador
 from django.db.models import Q
+from django.db import models
 
 
 # =====================================================
@@ -103,7 +104,12 @@ def cadastro_intervencao(request):
             else:  # Criar
                 # Gera o próximo código automático
                 prox_cod = (Intervencao.objects.aggregate(max_cod=models.Max('cod_intervencao'))['max_cod'] or 0) + 1
-                Intervencao.objects.create(cod_intervencao=prox_cod, descricao=descricao)
+
+                Intervencao.objects.create(
+                    cod_intervencao=prox_cod,
+                    descricao=descricao
+                )
+
 
         return redirect('cadastro_intervencao')
 
