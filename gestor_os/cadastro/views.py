@@ -143,6 +143,32 @@ def cadastro_colaborador(request):
     }
     return render(request, 'cadastro_colaborador/cadastro_colaborador.html', context)
 
+def editar_colaborador(request, pk):
+    colaborador = get_object_or_404(Colaborador, pk=pk)
+
+    if request.method == 'POST':
+        form = ColaboradorForm(request.POST, instance=colaborador)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Colaborador {colaborador.nome} atualizado com sucesso!')
+            return redirect('cadastro_colaborador')
+        else:
+            messages.error(request, 'Erro ao atualizar o colaborador. Verifique os campos.')
+    else:
+        form = ColaboradorForm(instance=colaborador)
+
+    colaboradores = Colaborador.objects.all().order_by('nome')
+
+    context = {
+        'form': form,
+        'colaboradores': colaboradores,
+        'editando': True,
+        'colaborador_editando': colaborador
+    }
+
+    return render(request, 'cadastro_colaborador/cadastro_colaborador.html', context)
+
+
 
 def excluir_colaborador(request, pk):
     colaborador = get_object_or_404(Colaborador, pk=pk)

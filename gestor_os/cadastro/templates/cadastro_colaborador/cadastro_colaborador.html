@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/cadastro_colaborador.css' %}">
+<link rel="stylesheet" href="{% static 'css/cadastro_colaboradores.css' %}">
 {% endblock head %}
 
 {% block body %}
@@ -10,7 +10,14 @@
 
     <!-- Painel esquerdo: formulário -->
     <div class="left-panel">
-        <h2>Cadastro de Colaboradores</h2>
+        <h2>
+            {% if editando %}
+            Editar Colaborador
+            {% else %}
+            Cadastrar Colaborador
+            {% endif %}
+        </h2>
+
 
         <form method="POST">
             {% csrf_token %}
@@ -48,7 +55,18 @@
                 {{ form.hr_saida_pm }}
             </div>
 
-            <button type="submit">Cadastrar</button>
+            <button type="submit">
+                {% if editando %}
+                Salvar Alterações
+                {% else %}
+                Cadastrar
+                {% endif %}
+            </button>
+
+            {% if editando %}
+            <a href="{% url 'cadastro_colaborador' %}" class="cancel-edit-btn">Cancelar</a>
+            {% endif %}
+
         </form>
     </div>
 
@@ -64,6 +82,7 @@
                     <th>Função</th>
                     <th>Valor/Hora</th>
                     <th>Turno</th>
+                    <th>Editar</th>
                     <th>Excluir</th>
                 </tr>
             </thead>
@@ -74,9 +93,13 @@
                     <td>{{ colaborador.nome }}</td>
                     <td>{{ colaborador.funcao }}</td>
                     <td>{{ colaborador.valor_hora }}</td>
-                    <td>{{ colaborador.get_turno_display }}</td>
+                    <td>{{ colaborador.turno }}</td>
                     <td>
-                        <a href="#" class="delete-btn" data-id="{{ colaborador.pk }}" data-nome="{{ colaborador.nome }}">🗑️</a>
+                        <a href="{% url 'editar_colaborador' colaborador.pk %}" class="edit-btn">✏️</a>
+                    </td>
+                    <td>
+                        <a href="#" class="delete-btn" data-id="{{ colaborador.pk }}"
+                            data-nome="{{ colaborador.nome }}">🗑️</a>
                     </td>
                 </tr>
                 {% endfor %}
