@@ -38,13 +38,13 @@
             <ul class="tree">
                 <li>
                     {% if item.filhos %}
-                        <span class="tree-toggle font-bold">{{ item.centro.descricao }} - {{ item.centro.cod_centro }}</span>
+                        <span class="tree-toggle font-bold"> <a href="#">{{ item.centro.descricao }} - {{ item.centro.cod_centro }}</a> </span>
                         <ul class="nested">
                             {% include 'cadastro_centro/subcentros.html' with subcentros=item.filhos %}
                         </ul>
                     {% else %}
-                        {{ item.centro.descricao }} - {{ item.centro.cod_centro }}
-                    {% endif %}
+                       {{ item.centro.descricao }} - {{ item.centro.cod_centro }} 
+                    {% endif %} 
                 </li>
             </ul>
         {% endfor %}
