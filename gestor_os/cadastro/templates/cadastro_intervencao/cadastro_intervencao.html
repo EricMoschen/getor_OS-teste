@@ -27,6 +27,7 @@
 
     <div class="right-panel">
         <h2>Intervenções Cadastradas</h2>
+
         <div class="table-container">
             {% if intervencoes %}
             <table class="client-table">
@@ -35,7 +36,7 @@
                         <th>Código</th>
                         <th>Descrição</th>
                         <th>Editar</th>
-                        <th>Excluir</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,18 +44,36 @@
                     <tr>
                         <td>{{ i.cod_intervencao }}</td>
                         <td>{{ i.descricao }}</td>
+
                         <td>
-                            <a href="#" class="edit-btn" data-id="{{ i.cod_intervencao }}" data-descricao="{{ i.descricao }}">✏️</a>
+                            <a href="#"
+                               class="edit-btn"
+                               data-id="{{ i.cod_intervencao }}"
+                               data-descricao="{{ i.descricao }}">
+                                ✏️
+                            </a>
                         </td>
+
                         <td>
-                            <a href="#" class="delete-btn" data-id="{{ i.cod_intervencao }}" data-nome="{{ i.descricao }}">🗑️</a>
+                            {% if i.os_count > 0 %}
+                                <span class="em-uso">
+                                    Em uso ({{ i.os_count }})
+                                </span>
+                            {% else %}
+                                <a href="#"
+                                   class="delete-btn"
+                                   data-id="{{ i.cod_intervencao }}"
+                                   data-nome="{{ i.descricao }}">
+                                    🗑️
+                                </a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             {% else %}
-            <p>Nenhuma intervenção cadastrada.</p>
+                <p>Nenhuma intervenção cadastrada.</p>
             {% endif %}
         </div>
     </div>
@@ -65,7 +84,12 @@
 <div id="deleteModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <p>Tem certeza que deseja excluir: <strong id="modalNome"></strong>?</p>
+
+        <p>
+            Tem certeza que deseja excluir:
+            <strong id="modalNome"></strong>?
+        </p>
+
         <form id="deleteForm" method="POST">
             {% csrf_token %}
             <button type="submit" class="confirm-btn">Sim, excluir</button>

@@ -4,6 +4,7 @@ from .forms import CentroCustoForm, ClienteForm, IntervencaoForm, ColaboradorFor
 from .models import CentroCusto, Cliente, Intervencao, Colaborador
 from django.db.models import Q
 from django.db import models
+from django.db.models import Count
 
 
 # =====================================================
@@ -97,29 +98,51 @@ def cadastro_intervencao(request):
         descricao = request.POST.get('descricao')
 
         if descricao:
-            if interv_id:  # Editar
-                interv = get_object_or_404(Intervencao, cod_intervencao=interv_id)
+            if interv_id:
+                # EDITAR
+                interv = get_object_or_404(
+                    Intervencao,
+                    cod_intervencao=interv_id
+                )
                 interv.descricao = descricao
                 interv.save()
-            else:  # Criar
-                # Gera o próximo código automático
-                prox_cod = (Intervencao.objects.aggregate(max_cod=models.Max('cod_intervencao'))['max_cod'] or 0) + 1
+            else:
+                # CRIAR
+                prox_cod = (
+                    Intervencao.objects.aggregate(
+                        max_cod=models.Max('cod_intervencao')
+                    )['max_cod'] or 0
+                ) + 1
 
                 Intervencao.objects.create(
                     cod_intervencao=prox_cod,
                     descricao=descricao
                 )
 
-
         return redirect('cadastro_intervencao')
 
-    intervencoes = Intervencao.objects.all().order_by('cod_intervencao')
-    return render(request, 'cadastro_intervencao/cadastro_intervencao.html', {
-        'intervencoes': intervencoes
-    })
+    # LISTAGEM COM CONTAGEM DE OS
+    intervencoes = Intervencao.objects.annotate(
+        os_count=Count('aberturaos')  # aqui usamos o related_name
+    ).order_by('cod_intervencao')
+
+    return render(
+        request,
+        'cadastro_intervencao/cadastro_intervencao.html',
+        {
+            'intervencoes': intervencoes
+        }
+    )
+
 
 def excluir_intervencao(request, pk):
     interv = get_object_or_404(Intervencao, pk=pk)
+
+    # BLOQUEIA EXCLUSÃO SE ESTIVER EM USO
+    if interv.aberturaos.exists():  # usamos o related_name correto
+        # opcional: você pode adicionar uma mensagem de erro aqui usando Django messages
+        return redirect('cadastro_intervencao')
+
     interv.delete()
     return redirect('cadastro_intervencao')
 

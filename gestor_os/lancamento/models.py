@@ -18,7 +18,7 @@ class AberturaOS(models.Model):
     descricao_os = models.TextField()
     centro_custo = models.ForeignKey(CentroCusto, on_delete=models.PROTECT)
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT,null=True, blank= True)
-    motivo_intervencao = models.ForeignKey(Intervencao, on_delete=models.PROTECT)
+    motivo_intervencao = models.ForeignKey(Intervencao, on_delete=models.PROTECT,related_name='aberturaos')
     ssm = models.CharField(max_length=10)
     situacao = models.CharField(
         max_length=2,
