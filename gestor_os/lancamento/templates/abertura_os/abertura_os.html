@@ -160,7 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ajuste específico: selects cliente e motivo
     const clienteSelect = form.querySelector('select[name="cliente"]');
     const motivoSelect = form.querySelector('select[name="motivo_intervencao"]');
-    if (clienteSelect) clienteSelect.value = osData.campos.cliente.toString();
+    if (clienteSelect && osData.campos.cliente) {
+      clienteSelect.value = osData.campos.cliente;
+    } else if (clienteSelect) {
+      clienteSelect.value = "";
+}
     if (motivoSelect) motivoSelect.value = osData.campos.motivo_intervencao.toString();
   }
 
@@ -188,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         centroLabel: tr.dataset.centroLabel,
         campos: {
           descricao_os: tr.dataset.descricao_os,
-          cliente: tr.dataset.cliente,
+          cliente: tr.dataset.cliente || null,
           motivo_intervencao: tr.dataset.motivo_intervencao,
           ssm: tr.dataset.ssm,
           responsavel: tr.dataset.responsavel,
