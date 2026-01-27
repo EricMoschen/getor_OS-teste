@@ -1,6 +1,3 @@
-- Criar verificação no apontamento de horas para gerar erro ao encerar as horas quando o apontamento inicial for menor que o enceramento desta OS 
-Erro "Erro no apontamento de Horas Extras"
-
 
 - fazer intefaçe para o enceramento das Os finalizadas, uso do PCM 
 

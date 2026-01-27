@@ -5,20 +5,21 @@
     display: flex;
     justify-content: space-between;
     gap: 20px;
-    padding: 30px;
+    padding: 10px;
     flex-wrap: wrap; /* permite empilhar em telas menores */
 }
 
 /* ==============================================
    PAINÉIS: ABRIR/EDITAR OS E TABELA DE OS
 ============================================== */
-.panel.abrir-os {
+.panel .abrir-os {
     flex: 1; /* menor largura */
     background: #1e293b;
-    padding: 20px;
+    padding: 15px;
     border-radius: 12px;
     color: #f1f5f9;
-    min-height: 400px;
+    min-height: 100vh;
+   
 }
 
 .panel.tabela-os {

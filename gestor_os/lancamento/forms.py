@@ -4,13 +4,12 @@ from .models import AberturaOS, Cliente
 class AberturaOSForm(forms.ModelForm):
     class Meta:
         model = AberturaOS
-        exclude = ['numero_os', 'data_abertura', 'centro_custo']
+        exclude = ['numero_os', 'data_abertura', 'centro_custo','situacao']
         fields = [
             'descricao_os',
             'cliente',
             'motivo_intervencao',
-            'ssm',
-            'situacao'
+            'ssm'
         ]
         widgets = {
             'descricao_os': forms.Textarea(attrs={'class':'w-full p-2 border rounded', 'rows':3}),
