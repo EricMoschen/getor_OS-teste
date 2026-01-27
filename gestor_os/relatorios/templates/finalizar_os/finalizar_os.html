@@ -76,7 +76,7 @@
                 </thead>
                 <tbody>
                     {% for o in ordens %}
-                    <tr class="linha-os {% if o.situacao == 'Finalizado' %}os-finalizada{% else %}os-aberta{% endif %}"
+                    <tr class="linha-os {% if o.situacao == 'FI' %}os-finalizada{% else %}os-aberta{% endif %}"
                         data-numero="{{ o.numero_os }}"
                         data-descricao="{{ o.descricao_os }}"
                         data-situacao="{{ o.get_situacao_display }}">
@@ -154,6 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
             numeroInput.value = numero;
             descricaoInput.value = this.dataset.descricao;
             situacaoInput.value = this.dataset.situacao;
+            observacoesInput.value = this.dataset.observacao;
             hiddenInput.value = numero;
         });
     });
