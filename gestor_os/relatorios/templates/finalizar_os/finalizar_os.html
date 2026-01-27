@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/finalizar_os.css' %}">
+{% endblock head %}
+
+{% block body %}
+<div class="container">
+
+    <!-- Painel esquerdo: Finalizar OS -->
+    <div class="panel finalizar-os">
+
+        <form method="post" action="{% url 'finalizar_os' %}">
+            {% csrf_token %}
+
+            <!-- Número da OS -->
+            <div class="form-group">
+                <label for="numero_os">Número da OS</label>
+                <input type="text" id="numero_os" name="numero_os" class="input-field" required>
+            </div>
+
+            <!-- Dados da OS -->
+            <div id="dados-os">
+
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <input type="text" id="descricao_os" class="input-field" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Situação Atual</label>
+                    <input type="text" id="situacao_os" class="input-field" readonly>
+                </div>
+
+                <!-- Observações -->
+                <div class="form-group">
+                    <label for="observacoes">Observações</label>
+                    <textarea name="observacoes" id="observacoes" class="input-field" rows="4"></textarea>
+                </div>
+
+                <input type="hidden" name="numero_os_hidden" id="numero_os_hidden">
+
+                <!-- Botão finalizar -->
+                <button type="submit" class="save-btn">✅ Finalizar OS</button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- Painel direito: Lista de OS -->
+    <div class="panel tabela-os">
+        <h2>Ordens em Aberto</h2>
+
+        <!-- Campo de busca -->
+        <input type="text" id="buscarTabela" class="input-field search-input"
+            placeholder="Buscar por número, descrição, cliente ou situação...">
+
+        <div class="os-table-container">
+            {% if ordens %}
+            <table class="os-table" id="tabelaOs">
+                <thead>
+                    <tr>
+                        <th>Nº OS</th>
+                        <th>Descrição</th>
+                        <th>Cliente</th>
+                        <th>Situação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for o in ordens %}
+                    <tr class="linha-os {% if o.situacao == 'FINALIZADA' %}os-finalizada{% else %}os-aberta{% endif %}"
+                        data-numero="{{ o.numero_os }}">
+
+                        <td>{{ o.numero_os }}</td>
+                        <td>{{ o.descricao_os }}</td>
+                        <td>{{ o.cliente }}</td>
+                        <td>{{ o.get_situacao_display }}</td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>Nenhuma OS encontrada.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+const numeroInput = document.getElementById("numero_os");
+
+// Buscar OS automaticamente ao digitar
+numeroInput.addEventListener("keyup", buscarAutomatico);
+numeroInput.addEventListener("change", buscarAutomatico);
+numeroInput.addEventListener("blur", buscarAutomatico);
+
+function buscarAutomatico() {
+    let numero = numeroInput.value.trim();
+
+    if (numero.length < 1) {
+        limparCampos();
+        return;
+    }
+
+    buscarOS(numero);
+}
+
+// Clique na linha → preenche OS
+document.querySelectorAll(".linha-os").forEach(row => {
+    row.addEventListener("click", function() {
+        let numero = this.dataset.numero;
+
+        numeroInput.value = numero;
+        document.getElementById("numero_os_hidden").value = numero;
+
+        buscarOS(numero);
+    });
+});
+
+// Buscar dados da OS via fetch
+function buscarOS(numero) {
+    fetch(`/relatorio/buscar-os/${numero}/`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.erro) {
+                limparCampos();
+                return;
+            }
+
+            document.getElementById("descricao_os").value = data.descricao;
+            document.getElementById("situacao_os").value = data.situacao;
+            document.getElementById("numero_os_hidden").value = numero;
+        });
+}
+
+// Limpa campos se OS não existir
+function limparCampos() {
+    document.getElementById("descricao_os").value = "";
+    document.getElementById("situacao_os").value = "";
+    document.getElementById("numero_os_hidden").value = "";
+}
+
+// FILTRO DA TABELA
+document.getElementById("buscarTabela").addEventListener("keyup", function() {
+    let filtro = this.value.toLowerCase();
+    let linhas = document.querySelectorAll("#tabelaOs tbody tr");
+
+    linhas.forEach(linha => {
+        let texto = linha.innerText.toLowerCase();
+        linha.style.display = texto.includes(filtro) ? "" : "none";
+    });
+});
+</script>
+
+
+
+{% endblock %}
+

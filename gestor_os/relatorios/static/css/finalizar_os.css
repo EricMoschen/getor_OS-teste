@@ -1,0 +1,217 @@
+/* ==============================================
+   LAYOUT GERAL
+============================================== */
+.container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+
+/* ==============================================
+   PAINÉIS: FINALIZAR OS E TABELA
+============================================== */
+.panel.finalizar-os {
+    flex: 1;
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 12px;
+    color: #f1f5f9;
+    min-height: 100vh;
+}
+
+.panel.tabela-os {
+    flex: 2;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    color: #f1f5f9;
+}
+
+/* ==============================================
+   FORMULÁRIO
+============================================== */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.input-field,
+input,
+textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #f1f5f9;
+    box-sizing: border-box;
+}
+
+.input-field:focus,
+textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* ==============================================
+   BOTÕES
+============================================== */
+.save-btn {
+    background: #3b82f6;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: .3s;
+    margin-top: 10px;
+}
+
+.save-btn:hover {
+    background: #2563eb;
+}
+
+/* Botão buscar OS */
+.search-btn {
+    background: #22c55e;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.search-btn:hover {
+    background: #16a34a;
+}
+
+/* ==============================================
+   TABELA DE OS
+============================================== */
+.os-table-container {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.os-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+.os-table thead {
+    background: #334155;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.os-table th,
+.os-table td {
+    padding: 12px 15px;
+    text-align: left;
+    width: 20%;
+}
+
+.os-table tbody tr {
+    border-bottom: 1px solid #334155;
+    transition: .3s;
+}
+
+.os-table tbody tr:hover {
+    background: #3b475a;
+}
+
+/* ==============================================
+   STATUS VISUAL
+============================================== */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-aberta {
+    background: #3b82f6;
+}
+
+.status-andamento {
+    background: #f59e0b;
+}
+
+.status-finalizada {
+    background: #22c55e;
+}
+
+/* ==============================================
+   UTILITÁRIOS
+============================================== */
+.hidden {
+    display: none;
+}
+
+/* ==============================================
+   RESPONSIVO
+============================================== */
+@media(max-width:768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .panel.tabela-os {
+        max-height: 400px;
+    }
+}
+
+/* ==============================================
+   SCROLL PERSONALIZADO
+============================================== */
+.os-table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.os-table-container::-webkit-scrollbar-thumb {
+    background: #3b475a;
+    border-radius: 4px;
+}
+
+.os-table-container::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+
+/* ==============================================
+   STATUS VISUAL NAS LINHAS
+============================================== */
+
+.os-aberta {
+    background: rgba(34, 197, 94, 0.08);
+    border-left: 4px solid #22c55e;
+}
+
+.os-finalizada {
+    background: rgba(239, 68, 68, 0.10);
+    border-left: 4px solid #ef4444;
+}
+
+.linha-os {
+    cursor: pointer;
+}
+
+.linha-os:hover {
+    background: #3b475a !important;
+}
+
+.search-input {
+    margin-bottom: 12px;
+    padding: 10px;
+    font-size: 14px;
+}

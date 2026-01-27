@@ -12,7 +12,7 @@
 /* ==============================================
    PAINÉIS: ABRIR/EDITAR OS E TABELA DE OS
 ============================================== */
-.panel .abrir-os {
+.panel.abrir-os {
     flex: 1; /* menor largura */
     background: #1e293b;
     padding: 15px;
