@@ -11,7 +11,7 @@
     <!-- Painel esquerdo: Finalizar OS -->
     <div class="panel finalizar-os">
 
-        <form method="post" action="{% url 'finalizar_os' %}">
+        <form method="post" action="{% url 'finalizar_os' %}" id="finalizarForm">
             {% csrf_token %}
 
             <!-- Número da OS -->
@@ -25,7 +25,7 @@
 
                 <div class="form-group">
                     <label>Descrição</label>
-                    <input type="text" id="descricao_os" class="input-field" readonly>
+                    <textarea id="descricao_os" class="input-field" readonly rows="4"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -36,8 +36,13 @@
                 <!-- Observações -->
                 <div class="form-group">
                     <label for="observacoes">Observações</label>
-                    <textarea name="observacoes" id="observacoes" class="input-field" rows="4"></textarea>
+                    <textarea name="observacoes" id="observacoes" class="input-field" rows="4" required></textarea>
+                    <p class="field-error" id="erroObservacoes" style="display:none;">É obrigatório informar uma observação.</p>
                 </div>
+
+                {% if erro %}
+                <p class="field-error">{{ erro }}</p>
+                {% endif %}
 
                 <input type="hidden" name="numero_os_hidden" id="numero_os_hidden">
 
@@ -71,14 +76,14 @@
                 </thead>
                 <tbody>
                     {% for o in ordens %}
-                    <tr class="linha-os {% if o.situacao == 'FINALIZADA' %}os-finalizada{% else %}os-aberta{% endif %}"
-                        data-numero="{{ o.numero_os }}">
-
+                    <tr class="linha-os {% if o.situacao == 'Finalizado' %}os-finalizada{% else %}os-aberta{% endif %}"
+                        data-numero="{{ o.numero_os }}"
+                        data-descricao="{{ o.descricao_os }}"
+                        data-situacao="{{ o.get_situacao_display }}">
                         <td>{{ o.numero_os }}</td>
                         <td>{{ o.descricao_os }}</td>
                         <td>{{ o.cliente }}</td>
                         <td>{{ o.get_situacao_display }}</td>
-
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -92,72 +97,93 @@
 </div>
 
 <script>
-const numeroInput = document.getElementById("numero_os");
+document.addEventListener("DOMContentLoaded", () => {
 
-// Buscar OS automaticamente ao digitar
-numeroInput.addEventListener("keyup", buscarAutomatico);
-numeroInput.addEventListener("change", buscarAutomatico);
-numeroInput.addEventListener("blur", buscarAutomatico);
+    const numeroInput = document.getElementById("numero_os");
+    const descricaoInput = document.getElementById("descricao_os");
+    const situacaoInput = document.getElementById("situacao_os");
+    const hiddenInput = document.getElementById("numero_os_hidden");
+    const observacoesInput = document.getElementById("observacoes");
+    const erroObs = document.getElementById("erroObservacoes");
+    const form = document.getElementById("finalizarForm");
 
-function buscarAutomatico() {
-    let numero = numeroInput.value.trim();
+    // =============================
+    // Buscar OS via fetch
+    // =============================
+    function buscarOS(numero) {
+        if (!numero) {
+            descricaoInput.value = "";
+            situacaoInput.value = "";
+            hiddenInput.value = "";
+            return;
+        }
 
-    if (numero.length < 1) {
-        limparCampos();
-        return;
+        fetch(`/relatorio/buscar-os/${numero}/`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.erro) {
+                    descricaoInput.value = "";
+                    situacaoInput.value = "";
+                    hiddenInput.value = "";
+                    return;
+                }
+                descricaoInput.value = data.descricao;
+                situacaoInput.value = data.situacao;
+                hiddenInput.value = numero;
+            })
+            .catch(() => {
+                descricaoInput.value = "";
+                situacaoInput.value = "";
+                hiddenInput.value = "";
+            });
     }
 
-    buscarOS(numero);
-}
+    // =============================
+    // Auto buscar ao digitar
+    // =============================
+    numeroInput.addEventListener("keyup", () => buscarOS(numeroInput.value.trim()));
+    numeroInput.addEventListener("change", () => buscarOS(numeroInput.value.trim()));
+    numeroInput.addEventListener("blur", () => buscarOS(numeroInput.value.trim()));
 
-// Clique na linha → preenche OS
-document.querySelectorAll(".linha-os").forEach(row => {
-    row.addEventListener("click", function() {
-        let numero = this.dataset.numero;
-
-        numeroInput.value = numero;
-        document.getElementById("numero_os_hidden").value = numero;
-
-        buscarOS(numero);
-    });
-});
-
-// Buscar dados da OS via fetch
-function buscarOS(numero) {
-    fetch(`/relatorio/buscar-os/${numero}/`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.erro) {
-                limparCampos();
-                return;
-            }
-
-            document.getElementById("descricao_os").value = data.descricao;
-            document.getElementById("situacao_os").value = data.situacao;
-            document.getElementById("numero_os_hidden").value = numero;
+    // =============================
+    // Preencher ao clicar na tabela
+    // =============================
+    document.querySelectorAll(".linha-os").forEach(row => {
+        row.addEventListener("click", function () {
+            let numero = this.dataset.numero;
+            numeroInput.value = numero;
+            descricaoInput.value = this.dataset.descricao;
+            situacaoInput.value = this.dataset.situacao;
+            hiddenInput.value = numero;
         });
-}
-
-// Limpa campos se OS não existir
-function limparCampos() {
-    document.getElementById("descricao_os").value = "";
-    document.getElementById("situacao_os").value = "";
-    document.getElementById("numero_os_hidden").value = "";
-}
-
-// FILTRO DA TABELA
-document.getElementById("buscarTabela").addEventListener("keyup", function() {
-    let filtro = this.value.toLowerCase();
-    let linhas = document.querySelectorAll("#tabelaOs tbody tr");
-
-    linhas.forEach(linha => {
-        let texto = linha.innerText.toLowerCase();
-        linha.style.display = texto.includes(filtro) ? "" : "none";
     });
+
+    // =============================
+    // Validação de Observações
+    // =============================
+    form.addEventListener("submit", function (e) {
+        if (observacoesInput.value.trim() === "") {
+            e.preventDefault();
+            erroObs.style.display = "block";
+            observacoesInput.focus();
+        } else {
+            erroObs.style.display = "none";
+        }
+    });
+
+    // =============================
+    // Filtro da tabela
+    // =============================
+    const buscarTabela = document.getElementById("buscarTabela");
+    buscarTabela.addEventListener("keyup", function () {
+        let filtro = this.value.toLowerCase();
+        document.querySelectorAll("#tabelaOs tbody tr").forEach(linha => {
+            let texto = linha.innerText.toLowerCase();
+            linha.style.display = texto.includes(filtro) ? "" : "none";
+        });
+    });
+
 });
 </script>
 
-
-
 {% endblock %}
-

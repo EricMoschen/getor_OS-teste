@@ -28,6 +28,9 @@ class AberturaOS(models.Model):
     )
     data_abertura = models.DateTimeField(auto_now_add=True)
 
+    
+    observacoes = models.TextField(blank=True, null=True)
+
     @classmethod
     def proximo_numero_os(cls):
         """Calcula o próximo número de OS sem salvar."""
