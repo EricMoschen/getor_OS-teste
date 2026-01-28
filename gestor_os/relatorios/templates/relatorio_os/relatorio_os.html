@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/relatorio_os.css' %}">
+{% endblock head %}
+
+{% block body %}
+<div class="container">
+
+    <h2 class="titulo">Relatório de Horas por OS</h2>
+
+    <!-- FILTRO -->
+    <form method="GET" class="filtro-box">
+
+        <div class="form-group">
+            <label>Número da OS</label>
+            <input type="text" name="os" class="input-field" placeholder="Digite a OS..." value="{{ request.GET.os }}">
+        </div>
+
+        <div class="form-group">
+            <label>Data Início</label>
+            <input type="date" name="data_inicio" class="input-field" value="{{ request.GET.data_inicio }}">
+        </div>
+
+        <div class="form-group">
+            <label>Data Fim</label>
+            <input type="date" name="data_fim" class="input-field" value="{{ request.GET.data_fim }}">
+        </div>
+
+        <button type="submit" class="btn-primary">Buscar</button>
+
+        {% if relatorio %}
+        <button type="submit" name="export_pdf" value="1" class="btn-secondary">
+            Exportar PDF
+        </button>
+        {% endif %}
+
+    </form>
+
+
+    <!-- DADOS DA OS -->
+    {% if os_detalhes %}
+    <div class="box-info">
+        <p><strong>OS:</strong> {{ os_detalhes.numero }}</p>
+        <p><strong>Descrição:</strong> {{ os_detalhes.descricao }}</p>
+        <p><strong>Cliente:</strong> {{ os_detalhes.cliente }}</p>
+        <p><strong>Motivo:</strong> {{ os_detalhes.motivo }}</p>
+    </div>
+    {% endif %}
+    {% if request.GET.data_inicio or request.GET.data_fim %}
+    <div class="box-info">
+        <p><strong>Período:</strong>
+            {{ request.GET.data_inicio|default:"--" }}
+            até
+            {{ request.GET.data_fim|default:"--" }}
+        </p>
+    </div>
+    {% endif %}
+
+
+    <!-- TABELA -->
+    {% if relatorio %}
+    <div class="table-box">
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>Matrícula</th>
+                    <th>Colaborador</th>
+                    <th>Horas Normais</th>
+                    <th>Horas 50%</th>
+                    <th>Horas 100%</th>
+                    <th>Total Geral</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in relatorio %}
+                <tr>
+                    <td>{{ r.matricula }}</td>
+                    <td>{{ r.nome }}</td>
+
+                    <td>{{ r.horas_normais_fmt }}</td>
+                    <td>{{ r.horas_50_fmt }}</td>
+                    <td>{{ r.horas_100_fmt }}</td>
+
+                    <td class="total">
+                        {{ r.total_fmt }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+    {% else %}
+    {% if request.GET.os %}
+    <p class="alert">Nenhuma hora encontrada para esta OS.</p>
+    {% endif %}
+    {% endif %}
+
+</div>
+
+{% endblock %}

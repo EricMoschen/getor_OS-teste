@@ -1,4 +1,14 @@
-
-- fazer intefaçe para o enceramento das Os finalizadas, uso do PCM 
-
 - Tela com Grafana das 20 ultimas OS abertas em tempo real, para visualização 
+
+
+- Relatório Horas trabalhadas por OS 
+    - Filtro
+    - Campo para informar a Os
+    -Retorna tipo tabela:
+        - A Matricula e nome do colaborador que teve horas apontadas nesta OS   
+        - O total de horas normais ( Segunda a Sexta horario do turno de trabalho normas) 
+        referente ao colaborador  
+        - O total de horas 50% ( Horario alem do turno normal e os Sabádos)
+        - O total de horas 100% (Domingos e Feriados)
+        - Opção para salvar em PDF, com as informações assima, incluindo o Numero, descrição, 
+        cliente, motivo, Matricula e nome do colaborador e totais de horas normais, 50%, 100%
