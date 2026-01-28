@@ -114,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!numero) {
             descricaoInput.value = "";
             situacaoInput.value = "";
+            observacoesInput.value = "";
             hiddenInput.value = "";
             return;
         }
@@ -124,16 +125,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.erro) {
                     descricaoInput.value = "";
                     situacaoInput.value = "";
+                    observacoesInput.value = "";
                     hiddenInput.value = "";
                     return;
                 }
-                descricaoInput.value = data.descricao;
-                situacaoInput.value = data.situacao;
+                descricaoInput.value = data.descricao || "";
+                situacaoInput.value = data.situacao || "";
+                observacoesInput.value = data.observacoes || "";
                 hiddenInput.value = numero;
             })
             .catch(() => {
                 descricaoInput.value = "";
                 situacaoInput.value = "";
+                observacoesInput.value = "";
                 hiddenInput.value = "";
             });
     }
@@ -154,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
             numeroInput.value = numero;
             descricaoInput.value = this.dataset.descricao;
             situacaoInput.value = this.dataset.situacao;
-            observacoesInput.value = this.dataset.observacao;
+            buscarOS(numero)
             hiddenInput.value = numero;
         });
     });
