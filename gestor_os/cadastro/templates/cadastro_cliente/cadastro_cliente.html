@@ -59,11 +59,21 @@
                         <td>{{ cliente.cod_cliente }}</td>
                         <td>{{ cliente.nome_cliente }}</td>
                         <td>
-                            <a href="#" class="edit-btn" data-id="{{ cliente.id }}" data-nome="{{ cliente.nome_cliente }}" data-cod="{{ cliente.cod_cliente }}">✏️</a>
+                            <a href="#" class="edit-btn" data-id="{{ cliente.id }}"
+                                data-nome="{{ cliente.nome_cliente }}" data-cod="{{ cliente.cod_cliente }}">✏️</a>
                         </td>
                         <td>
-                            <a href="#" class="delete-btn" data-id="{{ cliente.pk }}" data-nome="{{ cliente.nome_cliente }}">🗑️</a>
+                            {% if cliente.os_count > 0 %}
+                            <span class="em-uso">
+                                Em uso ({{ cliente.os_count }})
+                            </span>
+                            {% else %}
+                            <a href="#" class="delete-btn" data-id="{{ cliente.id }}" data-nome="{{ cliente.nome_cliente }}">
+                                🗑️
+                            </a>
+                            {% endif %}
                         </td>
+
                     </tr>
                     {% endfor %}
                 </tbody>

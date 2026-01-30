@@ -2,13 +2,27 @@
 
 
 - Relatório Horas trabalhadas por OS 
-    - Filtro
-    - Campo para informar a Os
-    -Retorna tipo tabela:
-        - A Matricula e nome do colaborador que teve horas apontadas nesta OS   
+    - Filtro ✅
+    - Campo para informar a Os ✅
+    - Retorna tipo tabela: ✅
+        - A Matricula e nome do colaborador que teve horas apontadas nesta OS ✅
         - O total de horas normais ( Segunda a Sexta horario do turno de trabalho normas) 
-        referente ao colaborador  
-        - O total de horas 50% ( Horario alem do turno normal e os Sabádos)
-        - O total de horas 100% (Domingos e Feriados)
-        - Opção para salvar em PDF, com as informações assima, incluindo o Numero, descrição, 
+        referente ao colaborador  ✅
+        - O total de horas 50% ( Horario alem do turno normal e os Sabádos) ✅
+        - O total de horas 100% (Domingos e Feriados) ✅
+    - Opção para salvar em PDF, com as informações assima, incluindo o Numero, descrição, 
         cliente, motivo, Matricula e nome do colaborador e totais de horas normais, 50%, 100%
+
+
+- verificar edição das Abertura das OS ( Não esta puchando os dado para edição)
+
+- criar vericação se o estatus estiver como Finalizado não permite lançar horas na OS ,
+mensagem de erro "OS encerrada, entre em contato com o PCM"
+
+- verificar e adicionar mensagens na hora de excluir um registo de todos os modulos,
+seguindo o mesmo modelo do Intervenção
+        - Modulo de intervencao  ✅
+        - Modulo de Cadastro de Clientes ✅
+        - Modulo de Cadastro de Colaborador 
+ 
+- 

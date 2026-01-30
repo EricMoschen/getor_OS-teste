@@ -42,25 +42,28 @@ def cadastrar_centro_custo(request):
 # =====================================================
 
 def cadastro_cliente(request):
-
     mensagem_erro = None
-    
 
     if request.method == 'POST':
         cliente_id = request.POST.get("cliente_id") or None
         cod = request.POST.get("cod_cliente")
         nome = request.POST.get("nome_cliente")
 
-        # VERIFICACR SE O CÓDIGO JÁ EXISTE EM OUTRO CLIENTE
-        cliente_existente = Cliente.objects.filter(cod_cliente=cod).exclude(pk=cliente_id).first()
+        # VERIFICAR SE O CÓDIGO JÁ EXISTE EM OUTRO CLIENTE
+        cliente_existente = Cliente.objects.filter(
+            cod_cliente=cod
+        ).exclude(pk=cliente_id).first()
 
-        if Cliente.objects.filter(cod_cliente=cod).exclude(pk=cliente_id).exists():
-            mensagem_erro = f"Já existe um Cliente com o Código Informado: <br> {cod} - {cliente_existente.nome_cliente}."
+        if cliente_existente:
+            mensagem_erro = (
+                f"Já existe um Cliente com o Código informado:<br>"
+                f"{cod} - {cliente_existente.nome_cliente}."
+            )
         else:
-        # EDITAR CLIENTE
+            # EDITAR CLIENTE
             if cliente_id:
                 cliente = Cliente.objects.get(pk=cliente_id)
-                cliente.cod_cliente = cod 
+                cliente.cod_cliente = cod
                 cliente.nome_cliente = nome
                 cliente.save()
 
@@ -73,9 +76,19 @@ def cadastro_cliente(request):
 
             return redirect('cadastro_cliente')
 
-    # LISTAR CLIENTES
-    clientes = Cliente.objects.all().order_by('cod_cliente')
-    return render(request, "cadastro_cliente/cadastro_cliente.html", {"clientes": clientes, "mensagem_erro":mensagem_erro})
+    # LISTAR CLIENTES COM CONTAGEM DE OS
+    clientes = Cliente.objects.annotate(
+        os_count=Count('aberturaos')  # related_name
+    ).order_by('cod_cliente')
+
+    return render(
+        request,
+        "cadastro_cliente/cadastro_cliente.html",
+        {
+            "clientes": clientes,
+            "mensagem_erro": mensagem_erro
+        }
+    )
 
 
 def excluir_cliente(request, pk):
@@ -163,13 +176,17 @@ def cadastro_colaborador(request):
     else:
         form = ColaboradorForm()
 
-    # Listagem de colaboradores
-    colaboradores = Colaborador.objects.all().order_by('nome')
-
+    # LISTAR CLIENTES COM CONTAGEM DE OS
+    colaboradores = Colaborador.objects.annotate(
+        os_count=Count('apontamentohoras')  # related_name
+    ).order_by('nome')
+    
     context = {
         'form': form,
         'colaboradores': colaboradores,
     }
+
+
     return render(request, 'cadastro_colaborador/cadastro_colaborador.html', context)
 
 def editar_colaborador(request, pk):

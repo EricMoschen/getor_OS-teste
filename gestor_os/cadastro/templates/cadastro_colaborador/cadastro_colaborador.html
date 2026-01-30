@@ -98,8 +98,16 @@
                         <a href="{% url 'editar_colaborador' colaborador.pk %}" class="edit-btn">✏️</a>
                     </td>
                     <td>
-                        <a href="#" class="delete-btn" data-id="{{ colaborador.pk }}"
-                            data-nome="{{ colaborador.nome }}">🗑️</a>
+                        {% if colaborador.os_count > 0 %}
+                        <span class="em-uso">
+                            Em uso ({{ colaborador.os_count }})
+                        </span>
+                        {% else %}
+                        <a href="#" class="delete-btn" data-id="{{ colaborador.id }}"
+                            data-nome="{{ colaborador.nome }}">
+                            🗑️
+                        </a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
