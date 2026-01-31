@@ -25,4 +25,5 @@ seguindo o mesmo modelo do Intervenção
         - Modulo de Cadastro de Clientes ✅
         - Modulo de Cadastro de Colaborador 
  
-- 
+- incluir para que no Relatório das OS as horas devem aparecer somdas apartir do dia 20 de cada mes
+( quado for dia 20 ele zera as horas e começa somar apartir ate o dia 20 do proximo mes)
