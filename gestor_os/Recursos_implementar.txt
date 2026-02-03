@@ -22,8 +22,8 @@ mensagem de erro "OS encerrada, entre em contato com o PCM"
 - verificar e adicionar mensagens na hora de excluir um registo de todos os modulos,
 seguindo o mesmo modelo do Intervenção
         - Modulo de intervencao  ✅
-        - Modulo de Cadastro de Clientes ✅
-        - Modulo de Cadastro de Colaborador 
+        - Modulo de Cadastro de Clientes  ✅
+        - Modulo de Cadastro de Colaborador ✅
  
 - incluir para que no Relatório das OS as horas devem aparecer somdas apartir do dia 20 de cada mes
 ( quado for dia 20 ele zera as horas e começa somar apartir ate o dia 20 do proximo mes)

@@ -21,11 +21,15 @@
         <input type="text" id="matricula" name="matricula" placeholder="Ex: 1025" class="input-field" required>
       </div>
 
-      <!-- Nome colaborador (auto) -->
+      <!-- Nome colaborador -->
       <div class="form-group">
         <label for="nome_colaborador">Nome do Colaborador</label>
-        <input type="text" id="nome_colaborador" name="nome_colaborador" readonly class="input-field">
+        <div class="input-loading">
+          <input type="text" id="nome_colaborador" readonly class="input-field">
+          <span class="loading-spinner" id="loading-colaborador"></span>
+        </div>
       </div>
+
 
       <!-- Número da OS -->
       <div class="form-group">
@@ -33,11 +37,32 @@
         <input type="text" id="numero_os" name="numero_os" placeholder="Ex: 230" class="input-field" required>
       </div>
 
-      <!-- Descrição OS (auto) -->
+      <!-- Descrição OS -->
       <div class="form-group">
         <label for="descricao_os">Descrição da OS</label>
-        <textarea id="descricao_os" name="descricao_os" readonly rows="3" class="input-field"></textarea>
+        <div class="input-loading">
+          <textarea id="descricao_os" readonly rows="3" class="input-field"></textarea>
+          <span class="loading-spinner" id="loading-os"></span>
+        </div>
       </div>
+
+      
+      {% if messages %}
+      <div class="mb-4 space-y-2">
+        {% for message in messages %}
+        <div class="
+        px-4 py-3 rounded-lg text-white font-medium shadow
+        {% if message.tags == 'error' %} bg-red-500
+        {% elif message.tags == 'success' %} bg-green-500
+        {% elif message.tags == 'warning' %} bg-yellow-500
+        {% else %} bg-blue-500
+        {% endif %}
+      ">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
 
       <!-- Botões -->
       <div class="form-actions">
@@ -53,33 +78,34 @@
 
     <!-- Filtro -->
     <div class="filtro-container">
-      <input type="text" id="filtro" class="input-field" placeholder="Filtrar por Nº OS, descrição, centro de custo ou cliente...">
+      <input type="text" id="filtro" class="input-field"
+        placeholder="Filtrar por Nº OS, descrição, centro de custo ou cliente...">
     </div>
 
     <div class="os-table-container">
       {% if ordens %}
-        <table class="os-table">
-          <thead>
-            <tr>
-              <th>Nº OS</th>
-              <th>Descrição</th>
-              <th>Centro de Custo</th>
-              <th>Cliente</th>
-            </tr>
-          </thead>
-          <tbody id="lista-os">
-            {% for o in ordens %}
-              <tr>
-                <td>{{ o.numero_os }}</td>
-                <td>{{ o.descricao_os }}</td>
-                <td>{{ o.centro_custo.descricao }}</td>
-                <td>{{ o.cliente.nome_cliente }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <table class="os-table">
+        <thead>
+          <tr>
+            <th>Nº OS</th>
+            <th>Descrição</th>
+            <th>Centro de Custo</th>
+            <th>Cliente</th>
+          </tr>
+        </thead>
+        <tbody id="lista-os">
+          {% for o in ordens %}
+          <tr>
+            <td>{{ o.numero_os }}</td>
+            <td>{{ o.descricao_os }}</td>
+            <td>{{ o.centro_custo.descricao }}</td>
+            <td>{{ o.cliente.nome_cliente }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
       {% else %}
-        <p>Nenhuma OS encontrada.</p>
+      <p>Nenhuma OS encontrada.</p>
       {% endif %}
     </div>
   </div>

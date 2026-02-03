@@ -133,9 +133,16 @@ def apontar_horas(request):
         )
 
         os_obj = get_object_or_404(
-            AberturaOS.objects.only("id", "numero_os"),
+            AberturaOS.objects.only("id", "numero_os", "situacao"),
             numero_os=numero_os
         )
+
+        if acao == "iniciar" and os_obj.situacao == AberturaOS.STATUS_FINALIZADO:
+            messages.error(
+                request,
+                f"A OS {os_obj.numero_os} está {os_obj.get_situacao_display()} e não permite novos apontamentos, caso seja nescesário o apontamento verifique com o PCM"
+            )
+            return redirect("apontar_horas")
 
         agora = timezone.localtime()
 
@@ -152,7 +159,12 @@ def apontar_horas(request):
 
                 hr_inicio_turno = colaborador.calcular_horario_inicio_turno()
                 hr_fim_turno = colaborador.calcular_horario_fim_turno()
-                dentro_turno = hr_inicio_turno <= agora.time() <= hr_fim_turno
+                hora_atual = agora.time()
+                if hr_inicio_turno <= hr_fim_turno:
+                    dentro_turno = hr_inicio_turno <= hora_atual <= hr_fim_turno
+                else:
+                    dentro_turno = hora_atual >= hr_inicio_turno or hora_atual <= hr_fim_turno
+
 
                 # Se OS anterior não for do mesmo dia e não estiver dentro do turno → erro
                 if data_aberto != data_hoje and not dentro_turno:
@@ -172,12 +184,7 @@ def apontar_horas(request):
                         return redirect("apontar_horas")
 
             # Classifica tipo de dia
-            if agora.weekday() == 6:
-                tipo_dia = "Dom/Feriado"
-            elif agora.weekday() == 5:
-                tipo_dia = "Sábado"
-            else:
-                tipo_dia = "Dia Normal"
+            tipo_dia = ApontamentoHoras.classificar_tipo_dia(agora.date())
 
             # Cria novo apontamento
             ApontamentoHoras.objects.create(

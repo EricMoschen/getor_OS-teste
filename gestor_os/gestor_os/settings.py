@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "menu",
     "cadastro",
-    "lancamento",
+    "lancamento.apps.LancamentoConfig",
     "relatorios",
 ]
 

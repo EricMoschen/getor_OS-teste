@@ -9,9 +9,13 @@ import holidays
 # Model para Abertura de Ordens de Serviço
 # =====================================================
 class AberturaOS(models.Model):
+
+    STATUS_ABERTO = "AB"
+    STATUS_FINALIZADO = "FI"
+
     STATUS_OPCOES = [
-        ('AB', 'Em Aberto'),
-        ('FI', 'Finalizado'),
+        (STATUS_ABERTO, "Em Aberto"),
+        (STATUS_FINALIZADO, "Finalizado"),
     ]
 
     numero_os = models.CharField(max_length=8, unique=True, editable=False)
@@ -145,7 +149,7 @@ class ApontamentoHoras(models.Model):
 
             # Turno que passa da meia noite
             if saida < entrada:
-                fim_turno = fim_turno.replace(day=fim_turno.day + 1)
+                fim_turno = fim_turno + timedelta(days=1)
 
             ini_turno = timezone.make_aware(ini_turno)
             fim_turno = timezone.make_aware(fim_turno)
@@ -159,3 +163,28 @@ class ApontamentoHoras(models.Model):
         horas_50 = max(total_horas - horas_normais, 0)
 
         return horas_normais, horas_50, horas_100
+    
+
+    # =====================================================
+    # MÉTODO PARA ENCERRAR OS ABERTA
+    # =====================================================
+
+    @classmethod
+    def encerrar_aberto(cls, colaborador):
+        aberto = cls.objects.filter(
+            colaborador=colaborador,
+            data_fim__isnull=True
+        ).order_by('-data_inicio').first()
+
+        if not aberto:
+            raise ValueError("Nenhum apontamento aberto encontrado.")
+
+        agora = timezone.localtime()
+
+        if aberto.data_inicio > agora:
+            raise ValueError("Horário de início maior que horário atual.")
+
+        aberto.data_fim = agora
+        aberto.save(update_fields=["data_fim"])
+
+        return aberto
