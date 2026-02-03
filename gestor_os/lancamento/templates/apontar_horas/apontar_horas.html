@@ -46,23 +46,24 @@
         </div>
       </div>
 
-      
+
       {% if messages %}
-      <div class="mb-4 space-y-2">
+      <div class="messages">
         {% for message in messages %}
-        <div class="
-        px-4 py-3 rounded-lg text-white font-medium shadow
-        {% if message.tags == 'error' %} bg-red-500
-        {% elif message.tags == 'success' %} bg-green-500
-        {% elif message.tags == 'warning' %} bg-yellow-500
-        {% else %} bg-blue-500
-        {% endif %}
-      ">
+        <div class="alert-message
+      {% if message.tags == 'error' %} bg-red-500
+      {% elif message.tags == 'success' %} bg-green-500
+      {% elif message.tags == 'warning' %} bg-yellow-500
+      {% else %} bg-blue-500
+      {% endif %}
+      px-4 py-3 rounded-lg text-white font-medium shadow mb-2
+    ">
           {{ message }}
         </div>
         {% endfor %}
       </div>
       {% endif %}
+
 
       <!-- Botões -->
       <div class="form-actions">
@@ -91,6 +92,7 @@
             <th>Descrição</th>
             <th>Centro de Custo</th>
             <th>Cliente</th>
+            <th>Situação</th>
           </tr>
         </thead>
         <tbody id="lista-os">
@@ -100,6 +102,17 @@
             <td>{{ o.descricao_os }}</td>
             <td>{{ o.centro_custo.descricao }}</td>
             <td>{{ o.cliente.nome_cliente }}</td>
+            <td>
+              <span class="
+    px-2 py-1 rounded text-sm font-semibold
+    {% if o.situacao == 'FI' %} bg-red-100 text-red-700
+    {% elif o.situacao == 'AB' %} bg-green-100 text-green-700
+    {% endif %}
+  ">
+                {{ o.get_situacao_display }}
+              </span>
+            </td>
+
           </tr>
           {% endfor %}
         </tbody>

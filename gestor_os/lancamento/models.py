@@ -14,7 +14,7 @@ class AberturaOS(models.Model):
     STATUS_FINALIZADO = "FI"
 
     STATUS_OPCOES = [
-        (STATUS_ABERTO, "Em Aberto"),
+        (STATUS_ABERTO, "Ativa"),
         (STATUS_FINALIZADO, "Finalizado"),
     ]
 

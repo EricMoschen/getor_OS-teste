@@ -216,7 +216,7 @@ def apontar_horas(request):
     # GET → exibir tela
     ordens = AberturaOS.objects.select_related("centro_custo", "cliente").only(
         "numero_os", "descricao_os", "centro_custo__descricao", "cliente__nome_cliente"
-    )
+    ).order_by("-data_abertura")
 
     return render(request, "apontar_horas/apontar_horas.html", {"ordens": ordens})
 

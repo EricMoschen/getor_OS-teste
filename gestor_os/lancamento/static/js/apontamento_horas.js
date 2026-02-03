@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-
         if (loadingColab) loadingColab.style.display = "block";
         nomeInput.value = "Buscando...";
 
@@ -50,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!resp.ok) throw new Error();
 
         const data = await resp.json();
-
         nomeInput.value = data.nome || "Colaborador não encontrado";
 
       } catch {
@@ -93,7 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
           if (!resp.ok) throw new Error();
 
           const data = await resp.json();
-
           descricaoInput.value = data.descricao || "OS não encontrada";
 
         } catch {
@@ -102,27 +99,36 @@ document.addEventListener("DOMContentLoaded", () => {
           if (loadingOs) loadingOs.style.display = "none";
         }
 
-      }, 400); // debounce
+      }, 400);
+
     });
 
   }
 
   // ======================================================
-  // AUTO SUMIR MENSAGENS DJANGO
+  // AUTO SUMIR MENSAGENS DJANGO (10 segundos)
   // ======================================================
-  const mensagens = document.querySelector(".messages");
+  const alerts = document.querySelectorAll(".alert-message");
 
-  if (mensagens) {
+  alerts.forEach(alert => {
+
+    // 👇 clique para fechar
+    alert.addEventListener("click", () => {
+      alert.remove();
+    });
+
+    // 👇 sumir automaticamente
     setTimeout(() => {
 
-      mensagens.querySelectorAll("div").forEach(el => {
-        el.style.transition = "opacity 0.5s";
-        el.style.opacity = "0";
+      alert.style.transition = "opacity 0.5s ease";
+      alert.style.opacity = "0";
 
-        setTimeout(() => el.remove(), 500);
-      });
+      setTimeout(() => {
+        alert.remove();
+      }, 500);
 
-    }, 4000);
-  }
+    }, 4000); // 4 segundos
+
+  });
 
 });
