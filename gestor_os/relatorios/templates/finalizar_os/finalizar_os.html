@@ -37,7 +37,8 @@
                 <div class="form-group">
                     <label for="observacoes">Observações</label>
                     <textarea name="observacoes" id="observacoes" class="input-field" rows="4" required></textarea>
-                    <p class="field-error" id="erroObservacoes" style="display:none;">É obrigatório informar uma observação.</p>
+                    <p class="field-error" id="erroObservacoes" style="display:none;">É obrigatório informar uma
+                        observação.</p>
                 </div>
 
                 {% if erro %}
@@ -70,6 +71,7 @@
                     <tr>
                         <th>Nº OS</th>
                         <th>Descrição</th>
+                        <th>Centro Custo</th>
                         <th>Cliente</th>
                         <th>Situação</th>
                     </tr>
@@ -77,13 +79,22 @@
                 <tbody>
                     {% for o in ordens %}
                     <tr class="linha-os {% if o.situacao == 'FI' %}os-finalizada{% else %}os-aberta{% endif %}"
-                        data-numero="{{ o.numero_os }}"
-                        data-descricao="{{ o.descricao_os }}"
+                        data-numero="{{ o.numero_os }}" data-descricao="{{ o.descricao_os }}"
                         data-situacao="{{ o.get_situacao_display }}">
                         <td>{{ o.numero_os }}</td>
                         <td>{{ o.descricao_os }}</td>
+                        <td>{{ o.centro_custo.descricao }}</td>
                         <td>{{ o.cliente }}</td>
-                        <td>{{ o.get_situacao_display }}</td>
+                        <td>
+                            <span class="
+    px-2 py-1 rounded text-sm font-semibold
+    {% if o.situacao == 'FI' %} bg-red-100 text-red-700
+    {% elif o.situacao == 'AB' %} bg-green-100 text-green-700
+    {% endif %}
+  ">
+                                {{ o.get_situacao_display }}
+                            </span>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -97,98 +108,98 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", () => {
 
-    const numeroInput = document.getElementById("numero_os");
-    const descricaoInput = document.getElementById("descricao_os");
-    const situacaoInput = document.getElementById("situacao_os");
-    const hiddenInput = document.getElementById("numero_os_hidden");
-    const observacoesInput = document.getElementById("observacoes");
-    const erroObs = document.getElementById("erroObservacoes");
-    const form = document.getElementById("finalizarForm");
+        const numeroInput = document.getElementById("numero_os");
+        const descricaoInput = document.getElementById("descricao_os");
+        const situacaoInput = document.getElementById("situacao_os");
+        const hiddenInput = document.getElementById("numero_os_hidden");
+        const observacoesInput = document.getElementById("observacoes");
+        const erroObs = document.getElementById("erroObservacoes");
+        const form = document.getElementById("finalizarForm");
 
-    // =============================
-    // Buscar OS via fetch
-    // =============================
-    function buscarOS(numero) {
-        if (!numero) {
-            descricaoInput.value = "";
-            situacaoInput.value = "";
-            observacoesInput.value = "";
-            hiddenInput.value = "";
-            return;
-        }
-
-        fetch(`/relatorio/buscar-os/${numero}/`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.erro) {
-                    descricaoInput.value = "";
-                    situacaoInput.value = "";
-                    observacoesInput.value = "";
-                    hiddenInput.value = "";
-                    return;
-                }
-                descricaoInput.value = data.descricao || "";
-                situacaoInput.value = data.situacao || "";
-                observacoesInput.value = data.observacoes || "";
-                hiddenInput.value = numero;
-            })
-            .catch(() => {
+        // =============================
+        // Buscar OS via fetch
+        // =============================
+        function buscarOS(numero) {
+            if (!numero) {
                 descricaoInput.value = "";
                 situacaoInput.value = "";
                 observacoesInput.value = "";
                 hiddenInput.value = "";
-            });
-    }
+                return;
+            }
 
-    // =============================
-    // Auto buscar ao digitar
-    // =============================
-    numeroInput.addEventListener("keyup", () => buscarOS(numeroInput.value.trim()));
-    numeroInput.addEventListener("change", () => buscarOS(numeroInput.value.trim()));
-    numeroInput.addEventListener("blur", () => buscarOS(numeroInput.value.trim()));
-
-    // =============================
-    // Preencher ao clicar na tabela
-    // =============================
-    document.querySelectorAll(".linha-os").forEach(row => {
-        row.addEventListener("click", function () {
-            let numero = this.dataset.numero;
-            numeroInput.value = numero;
-            descricaoInput.value = this.dataset.descricao;
-            situacaoInput.value = this.dataset.situacao;
-            buscarOS(numero)
-            hiddenInput.value = numero;
-        });
-    });
-
-    // =============================
-    // Validação de Observações
-    // =============================
-    form.addEventListener("submit", function (e) {
-        if (observacoesInput.value.trim() === "") {
-            e.preventDefault();
-            erroObs.style.display = "block";
-            observacoesInput.focus();
-        } else {
-            erroObs.style.display = "none";
+            fetch(`/relatorio/buscar-os/${numero}/`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.erro) {
+                        descricaoInput.value = "";
+                        situacaoInput.value = "";
+                        observacoesInput.value = "";
+                        hiddenInput.value = "";
+                        return;
+                    }
+                    descricaoInput.value = data.descricao || "";
+                    situacaoInput.value = data.situacao || "";
+                    observacoesInput.value = data.observacoes || "";
+                    hiddenInput.value = numero;
+                })
+                .catch(() => {
+                    descricaoInput.value = "";
+                    situacaoInput.value = "";
+                    observacoesInput.value = "";
+                    hiddenInput.value = "";
+                });
         }
-    });
 
-    // =============================
-    // Filtro da tabela
-    // =============================
-    const buscarTabela = document.getElementById("buscarTabela");
-    buscarTabela.addEventListener("keyup", function () {
-        let filtro = this.value.toLowerCase();
-        document.querySelectorAll("#tabelaOs tbody tr").forEach(linha => {
-            let texto = linha.innerText.toLowerCase();
-            linha.style.display = texto.includes(filtro) ? "" : "none";
+        // =============================
+        // Auto buscar ao digitar
+        // =============================
+        numeroInput.addEventListener("keyup", () => buscarOS(numeroInput.value.trim()));
+        numeroInput.addEventListener("change", () => buscarOS(numeroInput.value.trim()));
+        numeroInput.addEventListener("blur", () => buscarOS(numeroInput.value.trim()));
+
+        // =============================
+        // Preencher ao clicar na tabela
+        // =============================
+        document.querySelectorAll(".linha-os").forEach(row => {
+            row.addEventListener("click", function () {
+                let numero = this.dataset.numero;
+                numeroInput.value = numero;
+                descricaoInput.value = this.dataset.descricao;
+                situacaoInput.value = this.dataset.situacao;
+                buscarOS(numero)
+                hiddenInput.value = numero;
+            });
         });
-    });
 
-});
+        // =============================
+        // Validação de Observações
+        // =============================
+        form.addEventListener("submit", function (e) {
+            if (observacoesInput.value.trim() === "") {
+                e.preventDefault();
+                erroObs.style.display = "block";
+                observacoesInput.focus();
+            } else {
+                erroObs.style.display = "none";
+            }
+        });
+
+        // =============================
+        // Filtro da tabela
+        // =============================
+        const buscarTabela = document.getElementById("buscarTabela");
+        buscarTabela.addEventListener("keyup", function () {
+            let filtro = this.value.toLowerCase();
+            document.querySelectorAll("#tabelaOs tbody tr").forEach(linha => {
+                let texto = linha.innerText.toLowerCase();
+                linha.style.display = texto.includes(filtro) ? "" : "none";
+            });
+        });
+
+    });
 </script>
 
 {% endblock %}

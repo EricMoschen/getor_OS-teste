@@ -144,13 +144,13 @@ textarea:focus {
     background: #3b82f6;
 }
 
-.status-andamento {
-    background: #f59e0b;
+/* .status-andamento {
+    background: #22c55e;
 }
 
 .status-finalizada {
-    background: #22c55e;
-}
+    background: #ef4444;
+} */
 
 /* ==============================================
    UTILITÁRIOS
@@ -194,12 +194,12 @@ textarea:focus {
 
 .os-aberta {
     background: rgba(197, 186, 34, 0.178);
-    border-left: 4px solid #f59e0b;
+    border-left: 4px solid #22c55e;
 }
 
 .os-finalizada {
     background: rgba(34, 197, 94, 0.178);
-    border-left: 4px solid #22c55e;
+    border-left: 4px solid #ef4444;
 }   
 
 

@@ -1,0 +1,251 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ os.numero }} {{ os.descricao }}</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+
+    <style>
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+
+        /* ===== BORDAS ===== */
+        table th,
+        table td {
+            border: 2px solid #3a3a3a;
+        }
+
+        /* ===== CABEÇALHO MAIS ESCURO ===== */
+        thead th {
+            background-color: #9ca3af;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        /* ===== COLUNAS SEM COR (FUNÇÃO / VALOR HORA / TOTAL) ===== */
+        .col-neutra {
+            background-color {
+                background-color: #6b7280;
+                color: white;
+            }
+
+            ;
+        }
+
+        /* ===== HORAS NORMAIS VERDE ===== */
+        .col-normal-title {
+            background-color: #15803d;
+            color: white;
+        }
+
+        .col-normal {
+            background-color: #dcfce7;
+        }
+
+        /* ===== 50% AMARELO ===== */
+        .col-50-title {
+            background-color: #ca8a04;
+            color: white;
+        }
+
+        .col-50 {
+            background-color: #fef9c3;
+        }
+
+        /* ===== 100% VERMELHO ===== */
+        .col-100-title {
+            background-color: #b91c1c;
+            color: white;
+        }
+
+        .col-100 {
+            background-color: #fee2e2;
+        }
+
+        /* ===== TOTAL DESTACADO ===== */
+        .col-total-title {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .col-total {
+            font-weight: 700;
+        }
+
+
+
+        /* Total Horas */
+        .total-horas {
+            background-color: #dcfce7;
+            /* Verde claro */
+            padding: 8px 15px;
+            border: 2px solid #15803d;
+            border-radius: 8px;
+        }
+
+        /* Valor Total */
+        .valor-total {
+            background-color: #dbeafe;
+            /* Azul claro */
+            padding: 8px 15px;
+            border: 2px solid #2652b1;
+            border-radius: 8px;
+        }
+
+        .slect50 {
+            background-color: #d1a547;
+            border: none;
+        }
+
+        .slect100 {
+            background-color: #a74848;
+            border: none;
+        }
+
+        /* Remove setas no Chrome, Edge, Safari */
+        .valor_hora::-webkit-outer-spin-button,
+        .valor_hora::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Remove setas no Firefox */
+        .valor_hora {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+    <div class="max-w-7xl mx-auto bg-white shadow-xl rounded-2xl p-8">
+
+        <!-- CABEÇALHO -->
+        <div class="flex justify-between mb-6">
+
+            <div>
+                <img src="{% static 'img/tevere_logo.png' %}" class="h-16 mb-2">
+                <p><b>Empresa:</b> Tévere LTDA</p>
+                <p><b>CNPJ:</b> 79.827.473/0001-17</p>
+                <p><b>Endereço:</b> Acesso Leste, 1147</p>
+                <p><b>Tel:</b> (49) 3344-8600</p>
+            </div>
+
+            <div class="text-right">
+                <p class="text-xl font-bold">
+                    Orçamento Nº <span id="numero_orcamento">{{ numero_orcamento }}</span>
+                </p>
+                <p><b>Data:</b> {{ data_atual }}</p>
+            </div>
+
+        </div>
+        <hr class="border-gray-700">
+        <br>
+        <!-- DADOS OS -->
+        <div class="grid grid-cols-2 mb-6">
+            <p><b>Número da OS:</b> {{ os.numero }}</p>
+            <p class="col-span-2"><b>Descrição:</b> {{ os.descricao }}</p>
+            <p><b>Cliente:</b> {{ os.cliente }}</p>
+        </div>
+
+        <!-- TABELA -->
+        <table class="w-full text-sm border border-gray-700" id="tabela">
+
+            <thead>
+                <tr>
+                    <th class="p-2 col-neutra">Função</th>
+                    <th class="p-2 col-neutra">Valor Hora</th>
+
+                    <th class="p-2 col-normal-title">Horas Normais</th>
+                    <th class="p-2 col-normal-title">Normais R$</th>
+
+                    <th class="p-2 col-50-title">
+                        <select id="titulo50" class="slect50 border rounded p-1 bg-white text-black">
+                            <option value="1.5">Horas 50%</option>
+                            <option value="1.25">Horas 25%</option>
+                        </select>
+                    </th>
+                    <th class="p-2 col-50-title">50% R$</th>
+
+                    <th class="p-2 col-100-title">
+                        <select id="titulo100" class="slect100 border rounded p-1 bg-white text-black">
+                            <option value="2">Horas 100%</option>
+                            <option value="1.5">Horas 50%</option>
+                        </select>
+                    </th>
+                    <th class="p-2 col-100-title">100% R$</th>
+
+                    <th class="p-2 col-total-title">Total R$</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in apontamentos %}
+                <tr class="linha">
+
+                    <td class="p-2 col-neutra">{{ item.nome }}</td>
+
+                    <td class="p-2 col-neutra">
+                      <p> R$ <input type="number" class="valor_hora  border rounded px-1" value="0" step="0.01 "></p>
+                    </td>
+
+                    <td class="p-2 horas_normais col-normal">
+                        {{ item.horas_normais }}
+                    </td>
+
+                    <td class="p-2 normais_rs col-normal">0</td>
+
+                    <td class="p-2 horas50 col-50">
+                        {{ item.horas_50 }}
+                    </td>
+
+                    <td class="p-2 rs50 col-50">0</td>
+
+                    <td class="p-2 horas100 col-100">
+                        {{ item.horas_100 }}
+                    </td>
+
+                    <td class="p-2 rs100 col-100">0</td>
+
+                    <td class="p-2 total_rs col-total">0</td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+        <!-- TOTAIS -->
+        <div class="flex justify-between mt-6 text-lg font-bold">
+
+            <p class="total-horas">
+                Total Horas: <span id="total_horas">0</span>
+            </p>
+
+            <p class="valor-total">
+                Valor Total: R$ <span id="valor_total">0</span>
+            </p>
+
+        </div>
+
+
+        <!-- BOTÃO -->
+        <div class="text-right mt-6 no-print">
+            <button onclick="imprimir()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl shadow">
+                Imprimir
+            </button>
+        </div>
+
+    </div>
+
+    <script src="{% static 'js/orcamento_pdf.js' %}"></script>
+
+</body>
+
+</html>

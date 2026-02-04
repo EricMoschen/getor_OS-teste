@@ -47,7 +47,8 @@
 }
 
 .box-info {
-    background: #f8fafc;
+    background: #706addce;
+    color: #000;
     padding: 12px;
     border-radius: 10px;
     margin-bottom: 15px;

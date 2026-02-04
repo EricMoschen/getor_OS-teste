@@ -31,11 +31,11 @@
 
         <button type="submit" class="btn-primary">Buscar</button>
 
-        {% if relatorio %}
-        <button type="submit" name="export_pdf" value="1" class="btn-secondary">
-            Exportar PDF
-        </button>
-        {% endif %}
+        <a href="?os={{ request.GET.os }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}&export_pdf=1"
+            target="_blank" class="btn-secondary">
+            Gerar PDF
+        </a>
+
 
     </form>
 
