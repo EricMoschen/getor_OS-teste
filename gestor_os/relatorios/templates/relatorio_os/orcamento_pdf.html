@@ -5,121 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ os.numero }} {{ os.descricao }}</title>
-
+    <link rel="stylesheet" href="{% static 'css/orcamento_pdf.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-
-    <style>
-        @media print {
-            .no-print {
-                display: none;
-            }
-        }
-
-        /* ===== BORDAS ===== */
-        table th,
-        table td {
-            border: 2px solid #3a3a3a;
-        }
-
-        /* ===== CABEÇALHO MAIS ESCURO ===== */
-        thead th {
-            background-color: #9ca3af;
-            font-weight: 700;
-            color: #111827;
-        }
-
-        /* ===== COLUNAS SEM COR (FUNÇÃO / VALOR HORA / TOTAL) ===== */
-        .col-neutra {
-            background-color {
-                background-color: #6b7280;
-                color: white;
-            }
-
-            ;
-        }
-
-        /* ===== HORAS NORMAIS VERDE ===== */
-        .col-normal-title {
-            background-color: #15803d;
-            color: white;
-        }
-
-        .col-normal {
-            background-color: #dcfce7;
-        }
-
-        /* ===== 50% AMARELO ===== */
-        .col-50-title {
-            background-color: #ca8a04;
-            color: white;
-        }
-
-        .col-50 {
-            background-color: #fef9c3;
-        }
-
-        /* ===== 100% VERMELHO ===== */
-        .col-100-title {
-            background-color: #b91c1c;
-            color: white;
-        }
-
-        .col-100 {
-            background-color: #fee2e2;
-        }
-
-        /* ===== TOTAL DESTACADO ===== */
-        .col-total-title {
-            background-color: #6b7280;
-            color: white;
-        }
-
-        .col-total {
-            font-weight: 700;
-        }
-
-
-
-        /* Total Horas */
-        .total-horas {
-            background-color: #dcfce7;
-            /* Verde claro */
-            padding: 8px 15px;
-            border: 2px solid #15803d;
-            border-radius: 8px;
-        }
-
-        /* Valor Total */
-        .valor-total {
-            background-color: #dbeafe;
-            /* Azul claro */
-            padding: 8px 15px;
-            border: 2px solid #2652b1;
-            border-radius: 8px;
-        }
-
-        .slect50 {
-            background-color: #d1a547;
-            border: none;
-        }
-
-        .slect100 {
-            background-color: #a74848;
-            border: none;
-        }
-
-        /* Remove setas no Chrome, Edge, Safari */
-        .valor_hora::-webkit-outer-spin-button,
-        .valor_hora::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        /* Remove setas no Firefox */
-        .valor_hora {
-            -moz-appearance: textfield;
-        }
-    </style>
 </head>
 
 <body class="bg-gray-100 p-6">
@@ -192,7 +79,7 @@
                     <td class="p-2 col-neutra">{{ item.nome }}</td>
 
                     <td class="p-2 col-neutra">
-                      <p> R$ <input type="number" class="valor_hora  border rounded px-1" value="0" step="0.01 "></p>
+                        <p> R$ <input type="number" class="valor_hora  border rounded px-1" value="0" step="0.01 "></p>
                     </td>
 
                     <td class="p-2 horas_normais col-normal">

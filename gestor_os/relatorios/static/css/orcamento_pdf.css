@@ -1,94 +1,165 @@
-/* RESET */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
+@media print {
+
+    /* Força impressão em cores */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body {
+        background: white !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Remove sombras e arredondamentos que quebram PDF */
+    .shadow-xl {
+        box-shadow: none !important;
+    }
+
+    .rounded-2xl {
+        border-radius: 0 !important;
+    }
+
+    /* Ajusta largura para folha A4 */
+    .max-w-7xl {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Remove botão imprimir */
+    .no-print {
+        display: none !important;
+    }
+
+    /* Evita quebra dentro da tabela */
+    table {
+        page-break-inside: auto;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tfoot {
+        display: table-footer-group;
+    }
 }
 
-.container-orcamento {
-    max-width: 900px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    background: #fff;
+
+/* Define tamanho da folha */
+@page {
+    size: A4;
+    margin: 12mm;
 }
 
-.cabecalho {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin-bottom: 20px;
+
+/* ===== BORDAS ===== */
+table th,
+table td {
+    border: 2px solid #3a3a3a;
 }
 
-.cabecalho .logo img {
-    max-width: 150px;
-    height: auto;
+/* ===== CABEÇALHO MAIS ESCURO ===== */
+thead th {
+    background-color: #9ca3af;
+    font-weight: 700;
+    color: #111827;
 }
 
-.cabecalho .empresa-info, 
-.cabecalho .orcamento-info {
-    flex: 1 1 250px;
-    margin: 10px;
+/* ===== COLUNAS SEM COR (FUNÇÃO / VALOR HORA / TOTAL) ===== */
+.col-neutra {
+    background-color {
+        background-color: #6b7280;
+        color: white;
+    }
+
+    ;
 }
 
-.cliente-box {
-    margin-bottom: 20px;
-    padding: 10px;
-    border: 1px solid #eee;
-    background: #f9f9f9;
-}
-
-.cliente-box h4 {
-    margin-bottom: 10px;
-}
-
-.tabela-box {
-    overflow-x: auto;
-}
-
-.tabela-orcamento {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-.tabela-orcamento th, .tabela-orcamento td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-}
-
-.tabela-orcamento th {
-    background-color: #f0f0f0;
-}
-
-.botao-pdf {
-    margin-top: 20px;
-    text-align: right;
-}
-
-.btn-pdf {
-    padding: 10px 20px;
-    background-color: #0056b3;
+/* ===== HORAS NORMAIS VERDE ===== */
+.col-normal-title {
+    background-color: #15803d;
     color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
 }
 
-.btn-pdf:hover {
-    background-color: #004080;
+.col-normal {
+    background-color: #dcfce7;
 }
 
-/* RESPONSIVO */
-@media screen and (max-width: 768px) {
-    .cabecalho {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .cabecalho .empresa-info, .cabecalho .orcamento-info {
-        margin: 5px 0;
-    }
+/* ===== 50% AMARELO ===== */
+.col-50-title {
+    background-color: #ca8a04;
+    color: white;
+}
+
+.col-50 {
+    background-color: #fef9c3;
+}
+
+/* ===== 100% VERMELHO ===== */
+.col-100-title {
+    background-color: #b91c1c;
+    color: white;
+}
+
+.col-100 {
+    background-color: #fee2e2;
+}
+
+/* ===== TOTAL DESTACADO ===== */
+.col-total-title {
+    background-color: #6b7280;
+    color: white;
+}
+
+.col-total {
+    font-weight: 700;
+}
+
+
+
+/* Total Horas */
+.total-horas {
+    background-color: #dcfce7;
+    /* Verde claro */
+    padding: 8px 15px;
+    border: 2px solid #15803d;
+    border-radius: 8px;
+}
+
+/* Valor Total */
+.valor-total {
+    background-color: #dbeafe;
+    /* Azul claro */
+    padding: 8px 15px;
+    border: 2px solid #2652b1;
+    border-radius: 8px;
+}
+
+.slect50 {
+    background-color: #d1a547;
+    border: none;
+}
+
+.slect100 {
+    background-color: #a74848;
+    border: none;
+}
+
+/* Remove setas no Chrome, Edge, Safari */
+.valor_hora::-webkit-outer-spin-button,
+.valor_hora::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Remove setas no Firefox */
+.valor_hora {
+    -moz-appearance: textfield;
 }

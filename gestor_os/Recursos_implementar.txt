@@ -10,7 +10,7 @@
         - O total de horas 50% ( Horario alem do turno normal e os Sabádos) ✅
         - O total de horas 100% (Domingos e Feriados) ✅
     - Opção para salvar em PDF, com as informações assima, incluindo o Numero, descrição, 
-        cliente, motivo, Matricula e nome do colaborador e totais de horas normais, 50%, 100%
+        cliente, motivo, Matricula e nome do colaborador e totais de horas normais, 50%, 100% ✅
 
 
 - criar vericação se o estatus estiver como Finalizado não permite lançar horas na OS ,
