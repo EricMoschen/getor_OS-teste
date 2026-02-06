@@ -29,10 +29,10 @@
 
         <button type="submit" class="btn-primary">Buscar</button>
 
-        {% if relatorio %}
-        <a href="{% url 'log_os' os_detalhes.numero_os %}?{% if data_inicio %}data_inicio={{ data_inicio|date:'Y-m-d' }}&{% endif %}{% if data_fim %}data_fim={{ data_fim|date:'Y-m-d' }}{% endif %}"
+        {% if os_detalhes %}
+        <a href="{% url 'log_os_pdf' os_detalhes.numero_os %}?{% if data_inicio %}data_inicio={{ data_inicio|date:'Y-m-d' }}&{% endif %}{% if data_fim %}data_fim={{ data_fim|date:'Y-m-d' }}{% endif %}"
             target="_blank" class="btn-secondary">
-            Orçamento Geral
+            PDF Detalhado
         </a>
         {% endif %}
 

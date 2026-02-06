@@ -313,6 +313,9 @@ def relatorio_os(request):
         "os_detalhes": ordem_servico,
         "relatorio": relatorio,
         "totais": totais,
+        "filtro_os": numero_os,
+        "data_inicio" : data_inicio,
+        "data_fim": data_fim,
     }
 
     return render(request, "relatorio_os/relatorio_os.html", context)
