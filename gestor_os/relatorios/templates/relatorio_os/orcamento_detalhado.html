@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 10px;
+                color: #666;
+            }
+        }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            color: #222;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .header .empresa {
+            font-size: 10px;
+        }
+
+        .header .titulo h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .info-os {
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+
+        .card {
+            margin-top: 20px;
+            page-break-inside: avoid;
+        }
+
+        .card h3 {
+            background: #f0f0f0;
+            padding: 6px;
+            margin-bottom: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #e5e5e5;
+            font-weight: bold;
+        }
+
+        th,
+        td {
+            border: 1px solid #bbb;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .total-colab {
+            text-align: right;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .total-geral {
+            margin-top: 30px;
+            padding: 10px;
+            border: 2px solid #000;
+            text-align: right;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .assinatura {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .ass-box {
+            width: 40%;
+            text-align: center;
+            border-top: 1px solid #000;
+            padding-top: 5px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="empresa">
+            <img src="{{ logo_path }}" height="60">
+            <p><b>Tévere LTDA</b></p>
+            <p>CNPJ: 79.827.473/0001-17</p>
+            <p>Acesso Leste, 1147</p>
+            <p>(49) 3344-8600</p>
+        </div>
+        <div class="titulo">
+            <h1>Relatório de Horas</h1>
+            <p>Emitido em: {{ data_emissao }}</p>
+        </div>
+    </div>
+
+    <div class="info-os">
+        <p><b>OS:</b> {{ os.numero_os }}</p>
+        <p><b>Cliente:</b> {{ os.cliente }}</p>
+        <p><b>Descrição:</b> {{ os.descricao_os }}</p>
+        {% if data_inicio or data_fim %}
+        <p><b>Período:</b> {{ data_inicio|default:"--" }} até {{ data_fim|default:"--" }}</p>
+        {% endif %}
+    </div>
+
+    {% for colab in colaboradores %}
+    <div class="card">
+        <h3>{{ colab.colaborador.nome }}</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Duração</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ap in colab.apontamentos %}
+                <tr>
+                    <td>{{ ap.data }}</td>
+                    <td>{{ ap.inicio }}</td>
+                    <td>{{ ap.fim }}</td>
+                    <td>{{ ap.duracao }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="total-colab">
+            Total colaborador: {{ colab.total_horas }}
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="total-geral">
+        TOTAL GERAL: {{ total_geral }}
+    </div>
+
+    <div class="assinatura">
+        <div class="ass-box">Responsável Técnico</div>
+        <div class="ass-box">Cliente</div>
+    </div>
+
+</body>
+
+</html>

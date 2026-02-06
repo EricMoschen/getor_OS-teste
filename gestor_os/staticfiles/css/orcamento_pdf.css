@@ -1,0 +1,165 @@
+@media print {
+
+    /* Força impressão em cores */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body {
+        background: white !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Remove sombras e arredondamentos que quebram PDF */
+    .shadow-xl {
+        box-shadow: none !important;
+    }
+
+    .rounded-2xl {
+        border-radius: 0 !important;
+    }
+
+    /* Ajusta largura para folha A4 */
+    .max-w-7xl {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Remove botão imprimir */
+    .no-print {
+        display: none !important;
+    }
+
+    /* Evita quebra dentro da tabela */
+    table {
+        page-break-inside: auto;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tfoot {
+        display: table-footer-group;
+    }
+}
+
+
+/* Define tamanho da folha */
+@page {
+    size: A4;
+    margin: 12mm;
+}
+
+
+/* ===== BORDAS ===== */
+table th,
+table td {
+    border: 2px solid #3a3a3a;
+}
+
+/* ===== CABEÇALHO MAIS ESCURO ===== */
+thead th {
+    background-color: #9ca3af;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* ===== COLUNAS SEM COR (FUNÇÃO / VALOR HORA / TOTAL) ===== */
+.col-neutra {
+    background-color {
+        background-color: #6b7280;
+        color: white;
+    }
+
+    ;
+}
+
+/* ===== HORAS NORMAIS VERDE ===== */
+.col-normal-title {
+    background-color: #15803d;
+    color: white;
+}
+
+.col-normal {
+    background-color: #dcfce7;
+}
+
+/* ===== 50% AMARELO ===== */
+.col-50-title {
+    background-color: #ca8a04;
+    color: white;
+}
+
+.col-50 {
+    background-color: #fef9c3;
+}
+
+/* ===== 100% VERMELHO ===== */
+.col-100-title {
+    background-color: #b91c1c;
+    color: white;
+}
+
+.col-100 {
+    background-color: #fee2e2;
+}
+
+/* ===== TOTAL DESTACADO ===== */
+.col-total-title {
+    background-color: #6b7280;
+    color: white;
+}
+
+.col-total {
+    font-weight: 700;
+}
+
+
+
+/* Total Horas */
+.total-horas {
+    background-color: #dcfce7;
+    /* Verde claro */
+    padding: 8px 15px;
+    border: 2px solid #15803d;
+    border-radius: 8px;
+}
+
+/* Valor Total */
+.valor-total {
+    background-color: #dbeafe;
+    /* Azul claro */
+    padding: 8px 15px;
+    border: 2px solid #2652b1;
+    border-radius: 8px;
+}
+
+.slect50 {
+    background-color: #d1a547;
+    border: none;
+}
+
+.slect100 {
+    background-color: #a74848;
+    border: none;
+}
+
+/* Remove setas no Chrome, Edge, Safari */
+.valor_hora::-webkit-outer-spin-button,
+.valor_hora::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Remove setas no Firefox */
+.valor_hora {
+    -moz-appearance: textfield;
+}

@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 
-
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/relatorio_os.css' %}">
 {% endblock head %}
@@ -11,59 +10,70 @@
 
     <h2 class="titulo">Relatório de Horas por OS</h2>
 
-    <!-- FILTRO -->
     <form method="GET" class="filtro-box">
 
         <div class="form-group">
             <label>Número da OS</label>
-            <input type="text" name="os" class="input-field" placeholder="Digite a OS..." value="{{ request.GET.os }}">
+            <input type="text" name="os" class="input-field" value="{{ filtro_os }}">
         </div>
 
         <div class="form-group">
             <label>Data Início</label>
-            <input type="date" name="data_inicio" class="input-field" value="{{ request.GET.data_inicio }}">
+            <input type="date" name="data_inicio" class="input-field" value="{{ data_inicio|date:'Y-m-d' }}">
         </div>
 
         <div class="form-group">
             <label>Data Fim</label>
-            <input type="date" name="data_fim" class="input-field" value="{{ request.GET.data_fim }}">
+            <input type="date" name="data_fim" class="input-field" value="{{ data_fim|date:'Y-m-d' }}">
         </div>
 
         <button type="submit" class="btn-primary">Buscar</button>
 
-        <a href="?os={{ request.GET.os }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}&export_pdf=1"
+        {% if relatorio %}
+        <a href="{% url 'log_os' os_detalhes.numero_os %}?{% if data_inicio %}data_inicio={{ data_inicio|date:'Y-m-d' }}&{% endif %}{% if data_fim %}data_fim={{ data_fim|date:'Y-m-d' }}{% endif %}"
             target="_blank" class="btn-secondary">
-            Gerar PDF
+            Orçamento Geral
         </a>
+        {% endif %}
+
+        {% if os_detalhes %}
+        <a href="{% url 'log_os_pdf' os_detalhes.numero_os %}?{% if data_inicio %}data_inicio={{ data_inicio|date:'Y-m-d' }}&{% endif %}{% if data_fim %}data_fim={{ data_fim|date:'Y-m-d' }}{% endif %}"
+            target="_blank" class="btn-secondary">
+            PDF Detalhado
+        </a>
+        {% endif %}
+
+
 
 
     </form>
 
 
-    <!-- DADOS DA OS -->
     {% if os_detalhes %}
     <div class="box-info">
-        <p><strong>OS:</strong> {{ os_detalhes.numero }}</p>
-        <p><strong>Descrição:</strong> {{ os_detalhes.descricao }}</p>
+        <p><strong>OS:</strong> {{ os_detalhes.numero_os }}</p>
+        <p><strong>Descrição:</strong> {{ os_detalhes.descricao_os }}</p>
         <p><strong>Cliente:</strong> {{ os_detalhes.cliente }}</p>
-        <p><strong>Motivo:</strong> {{ os_detalhes.motivo }}</p>
+        <p><strong>Motivo:</strong> {{ os_detalhes.motivo_intervencao }}</p>
     </div>
     {% endif %}
-    {% if request.GET.data_inicio or request.GET.data_fim %}
+
+
+    {% if data_inicio or data_fim %}
     <div class="box-info">
         <p><strong>Período:</strong>
-            {{ request.GET.data_inicio|default:"--" }}
+            {{ data_inicio|date:"d/m/Y"|default:"--" }}
             até
-            {{ request.GET.data_fim|default:"--" }}
+            {{ data_fim|date:"d/m/Y"|default:"--" }}
         </p>
     </div>
     {% endif %}
 
 
-    <!-- TABELA -->
     {% if relatorio %}
     <div class="table-box">
         <table class="tabela">
+
             <thead>
                 <tr>
                     <th>Matrícula</th>
@@ -74,31 +84,39 @@
                     <th>Total Geral</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for r in relatorio %}
                 <tr>
                     <td>{{ r.matricula }}</td>
                     <td>{{ r.nome }}</td>
-
                     <td>{{ r.horas_normais_fmt }}</td>
                     <td>{{ r.horas_50_fmt }}</td>
                     <td>{{ r.horas_100_fmt }}</td>
-
-                    <td class="total">
-                        {{ r.total_fmt }}
-                    </td>
+                    <td class="total">{{ r.total_fmt }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
 
+            {% if totais %}
+            <tfoot>
+                <tr class="total-geral">
+                    <td colspan="2"><strong>TOTAL</strong></td>
+                    <td>{{ totais.normais }}</td>
+                    <td>{{ totais.extra50 }}</td>
+                    <td>{{ totais.extra100 }}</td>
+                    <td>{{ totais.geral }}</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+
         </table>
     </div>
     {% else %}
-    {% if request.GET.os %}
+    {% if filtro_os %}
     <p class="alert">Nenhuma hora encontrada para esta OS.</p>
     {% endif %}
     {% endif %}
 
 </div>
-
 {% endblock %}

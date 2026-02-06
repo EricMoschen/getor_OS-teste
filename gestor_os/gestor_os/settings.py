@@ -1,5 +1,7 @@
 from pathlib import Path
 
+
+
 # Caminho base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -108,8 +110,9 @@ USE_TZ = True
 # ARQUIVOS ESTÁTICOS
 # ==============================
 
-STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_URL = "/static/"
+
 
 # ==============================
 # OUTRAS CONFIGURAÇÕES
@@ -126,3 +129,5 @@ CSRF_TRUSTED_ORIGINS = [
     "https://localhost:8080",
     "http://127.0.0.1:8080",
 ]
+
+

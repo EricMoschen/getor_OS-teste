@@ -34,3 +34,8 @@ com o horario do turno do colaborador:
  - se for sabados, domingos, feriados, ou fora do horario de expediente, e não for encerada manualmente ele deve
  quando for lançar outra hora para este colaborador ele deve dar uma mensagem de erro de que a os não foi finalizada e deve 
  verificar com o Responsavel para corrigir.
+
+ - Corrigir erros na geração dos Orçamentos em PDF, ele não esta mantendo os intervalos das datas quando gera 
+ os PDFs, está puchando todo o periodo e não apenas do intervalo de informado 
+
+ - vericar formato das horas no Orçamentos dem PDF, esta retornando decimais em vez de Horas, formato hh:mm

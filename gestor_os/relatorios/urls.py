@@ -13,4 +13,10 @@ urlpatterns = [
 
     path("proximo_orcamento/", views.proximo_orcamento, name="proximo_orcamento"),
 
+    path("os/<str:numero_os>/log/", views.log_os, name="log_os"),
+   # urls.py do mesmo app   
+    path("os/<str:numero_os>/log/pdf/", views.log_os_pdf, name="log_os_pdf"),
+
+
+
 ]

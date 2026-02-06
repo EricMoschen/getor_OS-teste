@@ -1,0 +1,133 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 30px;
+  flex-wrap: wrap;
+}
+
+.panel.apontamento {
+  flex: 1;
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  color: #f1f5f9;
+  min-height: 400px;
+}
+
+.panel.tabela-os {
+  flex: 2;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 20px;
+  color: #f1f5f9;
+}
+
+.form-group { margin-bottom: 15px; }
+
+.input-field {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #f1f5f9;
+  box-sizing: border-box;
+}
+.input-field:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.save-btn {
+  background: #22c55e;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: .3s;
+}
+.save-btn:hover { background: #16a34a; }
+
+.delete-btn {
+  background: #ef4444;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: .3s;
+  margin-left: 10px;
+}
+.delete-btn:hover { background: #dc2626; }
+
+.os-table-container {
+  flex: 1;
+  overflow-y: auto;
+}
+.os-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1e293b;
+  color: #f1f5f9;
+}
+.os-table thead {
+  background: #334155;
+  position: sticky;
+  top: 0;
+}
+.os-table th, .os-table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+.os-table tbody tr {
+  border-bottom: 1px solid #334155;
+  transition: .3s;
+}
+.os-table tbody tr:hover { background: #3b475a; }
+
+.filtro-container { margin-bottom: 15px; }
+
+@media(max-width:768px) {
+  .container { flex-direction: column; }
+  .panel.tabela-os { max-height: 400px; }
+}
+
+.os-table-container::-webkit-scrollbar { width: 8px; }
+.os-table-container::-webkit-scrollbar-thumb {
+  background: #3b475a;
+  border-radius: 4px;
+}
+.os-table-container::-webkit-scrollbar-track { background: #1e293b; }
+
+
+.input-loading {
+  position: relative;
+}
+
+.loading-spinner {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 3px solid #ccc;
+  border-top: 3px solid #4f46e5;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  100% {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}

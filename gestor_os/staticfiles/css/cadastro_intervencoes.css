@@ -1,0 +1,213 @@
+/* Container principal */
+.container {
+    display: flex;
+    gap: 2rem;
+    height: 100vh;
+    padding: 1rem;
+}
+
+/* Painel esquerdo */
+.left-panel {
+    width: 40%;
+    background-color: #1e293b;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    height: 100%;
+}
+
+.left-panel h2 {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.left-panel form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.left-panel label {
+    font-weight: 500;
+    color: #f1f5f9;
+}
+
+.left-panel input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background-color: #0f172a;
+    border: 1px solid #475569;
+    border-radius: 0.5rem;
+    color: #f1f5f9;
+}
+
+.left-panel input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99,102,241,0.5);
+}
+
+/* BOTÕES — mesmo estilo do modal */
+#submitBtn,
+#cancelBtn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+/* Cadastrar / Salvar */
+#submitBtn {
+    background-color: #6366f1;
+    color: #fff;
+}
+
+#submitBtn:hover {
+    background-color: #4f46e5;
+}
+
+/* Cancelar */
+#cancelBtn {
+    background-color: #475569;
+    color: #fff;
+    display: none;
+}
+
+#cancelBtn:hover {
+    background-color: #334155;
+}
+
+/* Painel direito */
+.right-panel {
+    width: 60%;
+    background-color: #1e293b;
+    padding: 1rem;
+    border-radius: 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-header {
+    position: sticky;
+    top: 0;
+    background-color: #1e293b;
+    z-index: 10;
+    padding-bottom: 0.5rem;
+}
+
+.table-header h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 28px;
+}
+
+/* Container da tabela */
+.table-container {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Tabela */
+.client-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #f1f5f9;
+}
+
+.client-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #334155;
+    padding: 0.75rem;
+    text-align: left;
+    z-index: 5;
+}
+
+.client-table th, .client-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #475569;
+}
+
+.client-table tbody tr:hover {
+    background-color: #3b475a;
+}
+
+/* Botão excluir */
+.delete-btn {
+    color: #f87171;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+}
+
+.delete-btn:hover {
+    transform: scale(1.2);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(15, 23, 42, 0.8);
+}
+
+.modal-content {
+    background-color: #1e293b;
+    margin: 15% auto;
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 400px;
+    text-align: center;
+    color: #f1f5f9;
+}
+
+.modal-content .close {
+    float: right;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.confirm-btn,
+.cancel-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.confirm-btn {
+    background-color: #f87171;
+    color: #fff;
+}
+
+.confirm-btn:hover {
+    background-color: #dc2626;
+}
+
+.cancel-btn {
+    background-color: #475569;
+    color: #fff;
+}
+
+.cancel-btn:hover {
+    background-color: #334155;
+}

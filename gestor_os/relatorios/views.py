@@ -1,31 +1,35 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
-from django.conf import settings
 from django.utils import timezone
-from django.db.models import F
+from django.utils.dateparse import parse_date
+from django.conf import settings
 
-from lancamento.models import AberturaOS, ApontamentoHoras
-
-from datetime import datetime, timedelta, time
 from collections import defaultdict
+from datetime import datetime, timedelta, time
+
 import holidays
-import io
 import os
 
+from weasyprint import HTML
+from django.template.loader import render_to_string
 
+from lancamento.models import AberturaOS, ApontamentoHoras
+from .utils import gerar_proximo_orcamento, montar_dados_log_os
 
 
 # =====================================================
-# Finalizar OS
+# FINALIZAR OS
 # =====================================================
+
 def finalizar_os(request):
+
     ordens = AberturaOS.objects.all().order_by("-numero_os")
 
     if request.method == "POST":
+
         numero_os = request.POST.get("numero_os_hidden")
         observacoes = request.POST.get("observacoes", "").strip()
 
-        # Verifica se a observação foi informada
         if not observacoes:
             return render(request, "finalizar_os/finalizar_os.html", {
                 "ordens": ordens,
@@ -33,10 +37,11 @@ def finalizar_os(request):
             })
 
         try:
-            os = AberturaOS.objects.get(numero_os=numero_os)
-            os.observacoes = observacoes  # Salva a observação diretamente na OS
-            os.situacao = "FI"            # Marca como finalizada
-            os.save()
+            os_obj = AberturaOS.objects.get(numero_os=numero_os)
+
+            os_obj.observacoes = observacoes
+            os_obj.situacao = "FI"
+            os_obj.save()
 
             return redirect("finalizar_os")
 
@@ -46,78 +51,73 @@ def finalizar_os(request):
                 "erro": "OS não encontrada."
             })
 
-    # GET → renderiza tela normalmente
-    return render(request, "finalizar_os/finalizar_os.html", {
-        "ordens": ordens
-    })
+    return render(request, "finalizar_os/finalizar_os.html", {"ordens": ordens})
 
 
 # =====================================================
-# Buscar OS via AJAX
+# BUSCAR OS AJAX
 # =====================================================
+
 def buscar_os(request, numero_os):
+
     try:
-        os = AberturaOS.objects.get(numero_os=numero_os)
+        os_obj = AberturaOS.objects.get(numero_os=numero_os)
+
         return JsonResponse({
-            "descricao": os.descricao_os,
-            "situacao": os.get_situacao_display(),
-            "observacoes": os.observacoes or ""
+            "descricao": os_obj.descricao_os,
+            "situacao": os_obj.get_situacao_display(),
+            "observacoes": os_obj.observacoes or ""
         })
+
     except AberturaOS.DoesNotExist:
         return JsonResponse({"erro": True})
 
 
-
-
-
 # =====================================================
-# Relátorios OS 
+# CALCULO DE HORAS
 # =====================================================
 
 br_holidays = holidays.Brazil()
+
+
 def calcular_horas(inicio, fim, colaborador):
+
     inicio = timezone.localtime(inicio)
     fim = timezone.localtime(fim)
 
-    if fim < inicio:
+    if fim <= inicio:
         fim += timedelta(days=1)
 
     data_base = inicio.date()
     total_horas = (fim - inicio).total_seconds() / 3600
 
-    # =========================
-    # DOMINGO / FERIADO → 100%
-    # =========================
+    # Domingo / Feriado
     if data_base in br_holidays or inicio.weekday() == 6:
         return 0, 0, total_horas
 
-    # =========================
-    # SÁBADO → 50%
-    # =========================
+    # Sábado
     if inicio.weekday() == 5:
         return 0, total_horas, 0
 
     turno = colaborador.turno
-    blocos_validos = []
+    blocos = []
     almoco = None
 
-    # =========================
-    # TURNOS FIXOS
-    # =========================
     if turno == "A":
-        blocos_validos = [(7, 0, 11, 0), (12, 0, 16, 48)]
+        blocos = [(7, 0, 11, 0), (12, 0, 16, 48)]
         almoco = (11, 0, 12, 0)
 
     elif turno == "HC":
-        blocos_validos = [(8, 0, 12, 0), (13, 0, 17, 48)]
+        blocos = [(8, 0, 12, 0), (13, 0, 17, 48)]
         almoco = (12, 0, 13, 0)
 
     elif turno == "B":
-        blocos_validos = [(16, 48, 19, 0), (20, 0, 26, 0)]
+        blocos = [(16, 48, 19, 0), (20, 0, 26, 0)]
 
     elif turno == "OUTROS":
+
         if colaborador.hr_entrada_am and colaborador.hr_saida_am:
-            blocos_validos.append((
+            blocos.append((
                 colaborador.hr_entrada_am.hour,
                 colaborador.hr_entrada_am.minute,
                 colaborador.hr_saida_am.hour,
@@ -125,7 +125,7 @@ def calcular_horas(inicio, fim, colaborador):
             ))
 
         if colaborador.hr_entrada_pm and colaborador.hr_saida_pm:
-            blocos_validos.append((
+            blocos.append((
                 colaborador.hr_entrada_pm.hour,
                 colaborador.hr_entrada_pm.minute,
                 colaborador.hr_saida_pm.hour,
@@ -140,12 +140,10 @@ def calcular_horas(inicio, fim, colaborador):
                 colaborador.hr_entrada_pm.minute
             )
 
-    # =========================
-    # GERAR BLOCOS DATETIME
-    # =========================
     blocos_turno = []
 
-    for h1, m1, h2, m2 in blocos_validos:
+    for h1, m1, h2, m2 in blocos:
+
         ini = timezone.make_aware(datetime.combine(data_base, time(h1 % 24, m1)))
         fim_t = timezone.make_aware(datetime.combine(data_base, time(h2 % 24, m2)))
 
@@ -154,13 +152,11 @@ def calcular_horas(inicio, fim, colaborador):
 
         blocos_turno.append((ini, fim_t))
 
-    # =========================
-    # CALCULAR HORAS NORMAIS
-    # =========================
     horas_normais = 0
     blocos_trabalhados = []
 
     for ini_t, fim_t in blocos_turno:
+
         ini_real = max(inicio, ini_t)
         fim_real = min(fim, fim_t)
 
@@ -168,26 +164,23 @@ def calcular_horas(inicio, fim, colaborador):
             horas_normais += (fim_real - ini_real).total_seconds() / 3600
             blocos_trabalhados.append((ini_real, fim_real))
 
-    # =========================
-    # CALCULAR EXTRAS FORA DOS BLOCOS
-    # =========================
     horas_extras = 0
     cursor = inicio
 
     blocos_trabalhados.sort()
 
     for ini_b, fim_b in blocos_trabalhados:
+
         if cursor < ini_b:
             horas_extras += (ini_b - cursor).total_seconds() / 3600
+
         cursor = max(cursor, fim_b)
 
     if cursor < fim:
         horas_extras += (fim - cursor).total_seconds() / 3600
 
-    # =========================
-    # REMOVER HORÁRIO DE ALMOÇO DAS EXTRAS
-    # =========================
     if almoco:
+
         ah1, am1, ah2, am2 = almoco
 
         alm_ini = timezone.make_aware(datetime.combine(data_base, time(ah1, am1)))
@@ -199,221 +192,251 @@ def calcular_horas(inicio, fim, colaborador):
         if ini < fim_i:
             horas_extras -= (fim_i - ini).total_seconds() / 3600
 
-    # =========================
-    # TRAVA FINAL — NUNCA GERAR EXTRA ERRADO
-    # =========================
     horas_extras = max(horas_extras, 0)
     horas_extras = min(horas_extras, total_horas - horas_normais)
 
     return horas_normais, horas_extras, 0
 
 
+# =====================================================
+# FORMATAR HORAS
+# =====================================================
 
-from django.http import JsonResponse
-from .utils import gerar_proximo_orcamento
+def formatar_horas(horas):
+
+    if not horas:
+        return "00:00"
+
+    h = int(horas)
+    m = int(round((horas - h) * 60))
+
+    return f"{h:02d}:{m:02d}"
 
 
-def proximo_orcamento(request):
+# =====================================================
+# PROCESSAR RELATORIO
+# =====================================================
 
-    numero = gerar_proximo_orcamento()
+def processar_relatorio(apontamentos):
 
-    return JsonResponse({
-        "numero": str(numero).zfill(4)
+    colaboradores = defaultdict(lambda: {
+        "matricula": "",
+        "nome": "",
+        "normais": 0,
+        "extra50": 0,
+        "extra100": 0
     })
-
-
-
-from django.shortcuts import render
-from django.utils import timezone
-
-from lancamento.models import ApontamentoHoras, AberturaOS
-from .utils import ler_numero_orcamento
-
-def relatorio_os(request):
-
-    os_numero = request.GET.get("os")
-    data_inicio = request.GET.get("data_inicio")
-    data_fim = request.GET.get("data_fim")
-
-    os_detalhes = None
-
-    # ======================================================
-    # BASE QUERY
-    # ======================================================
-    apontamentos = ApontamentoHoras.objects.select_related(
-        "colaborador",
-        "ordem_servico"
-    )
-
-    # ======================================================
-    # FILTRO POR OS
-    # ======================================================
-    if os_numero:
-        apontamentos = apontamentos.filter(
-            ordem_servico__numero_os=os_numero
-        )
-
-        os_obj = AberturaOS.objects.filter(
-            numero_os=os_numero
-        ).select_related("cliente").first()
-
-        if os_obj:
-            os_detalhes = {
-                "numero": os_obj.numero_os,
-                "descricao": os_obj.descricao_os,
-                "cliente": str(os_obj.cliente),
-                "codigo_cliente": getattr(os_obj.cliente, "codigo", "")
-            }
-
-    # ======================================================
-    # FILTRO POR DATA
-    # ======================================================
-    if data_inicio:
-        apontamentos = apontamentos.filter(
-            data_inicio__date__gte=data_inicio
-        )
-
-    if data_fim:
-        apontamentos = apontamentos.filter(
-            data_fim__date__lte=data_fim
-        )
-
-    # ======================================================
-    # AGRUPAMENTO POR COLABORADOR (TELA)
-    # ======================================================
-    agrupado_colaborador = {}
-
-    # ======================================================
-    # AGRUPAMENTO POR FUNÇÃO (PDF)
-    # ======================================================
-    agrupado_funcao = {}
-
-    def fmt(valor):
-        return f"{valor:.2f}".replace(".", ",")
 
     for ap in apontamentos:
 
-        if not ap.data_fim:
+        if not ap.data_inicio or not ap.data_fim:
             continue
 
-        normais, h50, h100 = calcular_horas(
+        normais, extra50, extra100 = calcular_horas(
             ap.data_inicio,
             ap.data_fim,
             ap.colaborador
         )
 
-        # ================================
-        # AGRUPA POR COLABORADOR (TELA)
-        # ================================
-        colab = ap.colaborador
-        chave_colab = colab.id
+        col = colaboradores[ap.colaborador.id]
 
-        if chave_colab not in agrupado_colaborador:
-            agrupado_colaborador[chave_colab] = {
-                "matricula": getattr(colab, "matricula", "-"),
-                "nome": colab.nome,
-                "horas_normais": 0,
-                "horas_50": 0,
-                "horas_100": 0,
-            }
+        col["matricula"] = ap.colaborador.matricula
+        col["nome"] = ap.colaborador.nome
 
-        agrupado_colaborador[chave_colab]["horas_normais"] += normais
-        agrupado_colaborador[chave_colab]["horas_50"] += h50
-        agrupado_colaborador[chave_colab]["horas_100"] += h100
+        col["normais"] += normais
+        col["extra50"] += extra50
+        col["extra100"] += extra100
 
-        # ================================
-        # AGRUPA POR FUNÇÃO (PDF)
-        # ================================
-        funcao = getattr(colab, "funcao", colab.nome)
+    relatorio = []
+    totais = {"normais": 0, "extra50": 0, "extra100": 0, "geral": 0}
 
-        if funcao not in agrupado_funcao:
-            agrupado_funcao[funcao] = {
-                "funcao": funcao,
-                "horas_normais": 0,
-                "horas_50": 0,
-                "horas_100": 0,
-            }
+    for c in colaboradores.values():
 
-        agrupado_funcao[funcao]["horas_normais"] += normais
-        agrupado_funcao[funcao]["horas_50"] += h50
-        agrupado_funcao[funcao]["horas_100"] += h100
+        total = c["normais"] + c["extra50"] + c["extra100"]
 
-    # ======================================================
-    # CONVERTE → LISTA PARA TELA
-    # ======================================================
-    relatorio_individual = []
+        totais["normais"] += c["normais"]
+        totais["extra50"] += c["extra50"]
+        totais["extra100"] += c["extra100"]
+        totais["geral"] += total
 
-    for dados in agrupado_colaborador.values():
+        relatorio.append({
+            "matricula": c["matricula"],
+            "nome": c["nome"],
+            "horas_normais_fmt": formatar_horas(c["normais"]),
+            "horas_50_fmt": formatar_horas(c["extra50"]),
+            "horas_100_fmt": formatar_horas(c["extra100"]),
+            "total_fmt": formatar_horas(total),
+        })
 
-        total = (
-            dados["horas_normais"]
-            + dados["horas_50"]
-            + dados["horas_100"]
+    return relatorio, totais
+
+
+# =====================================================
+# RELATORIO OS
+# =====================================================
+
+def relatorio_os(request):
+
+    numero_os = request.GET.get("os")
+    data_inicio = parse_date(request.GET.get("data_inicio") or "")
+    data_fim = parse_date(request.GET.get("data_fim") or "")
+
+    ordem_servico = None
+    relatorio = []
+    totais = None
+
+    apontamentos = ApontamentoHoras.objects.select_related(
+        "colaborador",
+        "ordem_servico"
+    )
+
+    if numero_os:
+
+        ordem_servico = get_object_or_404(AberturaOS, numero_os=numero_os)
+
+        apontamentos = apontamentos.filter(ordem_servico=ordem_servico)
+
+    if data_inicio:
+        apontamentos = apontamentos.filter(
+            data_fim__gte=datetime.combine(data_inicio, time.min)
         )
 
-        relatorio_individual.append({
-            "matricula": dados["matricula"],
-            "nome": dados["nome"],
-
-            "horas_normais": round(dados["horas_normais"], 2),
-            "horas_50": round(dados["horas_50"], 2),
-            "horas_100": round(dados["horas_100"], 2),
-
-            "horas_normais_fmt": fmt(dados["horas_normais"]),
-            "horas_50_fmt": fmt(dados["horas_50"]),
-            "horas_100_fmt": fmt(dados["horas_100"]),
-            "total_fmt": fmt(total),
-        })
-
-    # ======================================================
-    # CONVERTE → LISTA PARA PDF
-    # ======================================================
-    relatorio_pdf = []
-
-    for dados in agrupado_funcao.values():
-
-        total = (
-            dados["horas_normais"]
-            + dados["horas_50"]
-            + dados["horas_100"]
+    if data_fim:
+        apontamentos = apontamentos.filter(
+            data_inicio__lte=datetime.combine(data_fim, time.max)
         )
 
-        relatorio_pdf.append({
-            "matricula": "-",
-            "nome": dados["funcao"],
+    if apontamentos.exists():
+        relatorio, totais = processar_relatorio(apontamentos)
 
-            "horas_normais": round(dados["horas_normais"], 2),
-            "horas_50": round(dados["horas_50"], 2),
-            "horas_100": round(dados["horas_100"], 2),
+    context = {
+        "os_detalhes": ordem_servico,
+        "relatorio": relatorio,
+        "totais": totais,
+    }
 
-            "horas_normais_fmt": fmt(dados["horas_normais"]),
-            "horas_50_fmt": fmt(dados["horas_50"]),
-            "horas_100_fmt": fmt(dados["horas_100"]),
-            "total_fmt": fmt(total),
+    return render(request, "relatorio_os/relatorio_os.html", context)
+
+
+# =====================================================
+# ORCAMENTO
+# =====================================================
+
+def proximo_orcamento(request):
+
+    numero = gerar_proximo_orcamento()
+
+    return JsonResponse({"numero": str(numero).zfill(4)})
+
+
+# =====================================================
+# LOG OS
+# =====================================================
+
+def log_os(request, numero_os):
+
+    contexto = montar_dados_log_os(numero_os)
+
+    return render(request, "relatorio_os/orcamento_detalhado.html", contexto)
+
+
+# =====================================================
+# PDF LOG OS
+# =====================================================
+ 
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from datetime import datetime, time
+from weasyprint import HTML
+from django.db.models import Q
+
+from lancamento.models import AberturaOS, ApontamentoHoras
+
+def formatar_horas(horas):
+    """Converte horas decimais em string HH:MM"""
+    if not horas or horas <= 0:
+        return "00:00"
+    h = int(horas)
+    m = int(round((horas - h) * 60))
+    return f"{h:02d}:{m:02d}"
+
+def log_os_pdf(request, numero_os):
+    # Buscar OS
+    os_obj = get_object_or_404(AberturaOS, numero_os=numero_os)
+
+    # Capturar filtros de data do GET
+    data_inicio_str = request.GET.get("data_inicio")
+    data_fim_str = request.GET.get("data_fim")
+    data_inicio = datetime.strptime(data_inicio_str, "%Y-%m-%d") if data_inicio_str else None
+    data_fim = datetime.strptime(data_fim_str, "%Y-%m-%d") if data_fim_str else None
+
+    # Buscar todos os apontamentos da OS
+    apontamentos = ApontamentoHoras.objects.filter(ordem_servico=os_obj)
+
+    # Aplicar filtro de intervalo: qualquer apontamento que sobreponha o período
+    if data_inicio and data_fim:
+        dt_inicio = datetime.combine(data_inicio, time.min)
+        dt_fim = datetime.combine(data_fim, time.max)
+        apontamentos = apontamentos.filter(Q(data_inicio__lte=dt_fim) & Q(data_fim__gte=dt_inicio))
+    elif data_inicio:
+        dt_inicio = datetime.combine(data_inicio, time.min)
+        apontamentos = apontamentos.filter(data_fim__gte=dt_inicio)
+    elif data_fim:
+        dt_fim = datetime.combine(data_fim, time.max)
+        apontamentos = apontamentos.filter(data_inicio__lte=dt_fim)
+
+    # Agrupar por colaborador
+    colab_dict = {}
+    total_geral_segundos = 0
+
+    for ap in apontamentos:
+        if not ap.data_inicio or not ap.data_fim:
+            continue
+
+        duracao_seg = (ap.data_fim - ap.data_inicio).total_seconds()
+        if duracao_seg <= 0:
+            continue  # ignora apontamentos com duração zero ou negativa
+
+        total_geral_segundos += duracao_seg
+
+        if ap.colaborador.id not in colab_dict:
+            colab_dict[ap.colaborador.id] = {
+                "colaborador": ap.colaborador,
+                "apontamentos": [],
+                "total_segundos": 0
+            }
+
+        colab_dict[ap.colaborador.id]["apontamentos"].append({
+            "data": ap.data_inicio.strftime("%d/%m/%Y"),
+            "inicio": ap.data_inicio.strftime("%H:%M"),
+            "fim": ap.data_fim.strftime("%H:%M"),
+            "duracao": f"{int(duracao_seg//3600):02d}:{int((duracao_seg%3600)//60):02d}",
+            "servico": getattr(ap, "servico", "-")
         })
+        colab_dict[ap.colaborador.id]["total_segundos"] += duracao_seg
 
-    # ======================================================
-    # NÚMERO ORÇAMENTO
-    # ======================================================
-    numero_orcamento = str(
-        ler_numero_orcamento()
-    ).zfill(4)
+    # Transformar em lista e formatar total por colaborador
+    colaboradores = []
+    for c in colab_dict.values():
+        c["total_horas"] = c["total_segundos"] / 3600
+        c["total_fmt"] = formatar_horas(c["total_horas"])
+        colaboradores.append(c)
 
-    # ======================================================
-    # EXPORTAR PDF
-    # ======================================================
-    if request.GET.get("export_pdf"):
-        return render(request, "relatorio_os/orcamento_pdf.html", {
-            "apontamentos": relatorio_pdf,
-            "os": os_detalhes,
-            "numero_orcamento": numero_orcamento,
-            "data_atual": timezone.now().strftime("%d/%m/%Y"),
-        })
+    # Contexto para o template PDF
+    context = {
+        "logo_path": request.build_absolute_uri('/static/img/logo.png'),
+        "data_emissao": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "os": os_obj,
+        "colaboradores": colaboradores,
+        "total_geral": formatar_horas(total_geral_segundos / 3600)
+    }
 
-    # ======================================================
-    # RELATÓRIO NORMAL
-    # ======================================================
-    return render(request, "relatorio_os/relatorio_os.html", {
-        "relatorio": relatorio_individual,
-        "os_detalhes": os_detalhes,
-    })
+    # Renderizar HTML
+    html_string = render(request, "relatorio_os/orcamento_detalhado.html", context).content.decode("utf-8")
+
+    # Gerar PDF
+    pdf = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
+
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response['Content-Disposition'] = f'inline; filename="log_os_{os_obj.numero_os}.pdf"'
+    return response
