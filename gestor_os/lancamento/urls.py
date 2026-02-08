@@ -14,4 +14,5 @@ urlpatterns = [
     path("apontar_horas/", views.apontar_horas, name="apontar_horas"),
     path("api/colaborador/<str:matricula>/", views.api_colaborador, name="api_colaborador"),
     path("api/os/<str:numero>/", views.api_os, name="api_os"),
+     path("api/os/detalhes/<int:pk>/", views.api_os_detalhes, name="api_os_detalhes"),
 ]

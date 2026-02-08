@@ -1,97 +1,213 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const selected = document.getElementById('dropdownSelected');
-  const list = document.getElementById('dropdownList');
-  const hiddenInput = document.getElementById('centro_custo');
 
-  function toggleList(show) {
-    if (typeof show === 'boolean') {
-      list.classList.toggle('hidden', !show);
-      list.setAttribute('aria-hidden', String(!show));
-    } else {
-      list.classList.toggle('hidden');
-      list.setAttribute('aria-hidden', String(list.classList.contains('hidden')));
+  /* ================================
+     ELEMENTOS
+  ================================= */
+
+  const form = document.querySelector('.abrir-os form');
+  const numeroOS = document.getElementById('numero_os');
+  const saveBtn = document.querySelector('.save-btn');
+  const cancelBtn = document.querySelector('.cancel-btn');
+  const deleteBtn = document.querySelector('.delete-btn');
+
+  const dropdown = {
+    selected: document.getElementById('dropdownSelected'),
+    list: document.getElementById('dropdownList'),
+    hidden: document.getElementById('centro_custo'),
+
+    set(cod, label) {
+      this.hidden.value = cod || '';
+      this.selected.textContent = label || 'Selecione um centro de custo';
+    },
+
+    toggle() {
+      this.list.classList.toggle('hidden');
+    },
+
+    close() {
+      this.list.classList.add('hidden');
+    }
+  };
+
+  /* ================================
+     DROPDOWN
+  ================================= */
+
+  dropdown.selected.addEventListener('click', e => {
+    e.stopPropagation();
+    dropdown.toggle();
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.dropdown-container')) {
+      dropdown.close();
+    }
+  });
+
+  dropdown.list.addEventListener('click', e => {
+
+    // ===== ABRIR / FECHAR FILHOS DO CENTRO DE CUSTO =====
+    const parentToggle = e.target.closest('.parent');
+    const isArrow = e.target.classList.contains('arrow');
+
+    if (parentToggle && isArrow) {
+
+      const cod = parentToggle.dataset.cod;
+      const children = document.getElementById(`children-${cod}`);
+      const arrow = parentToggle.querySelector('.arrow');
+
+      if (!children) return;
+
+      children.classList.toggle('hidden');
+      arrow.textContent = children.classList.contains('hidden') ? '▶' : '▼';
+
+      return; // ⛔ impede selecionar o pai
+    }
+
+    // ===== SELEÇÃO NORMAL (SEU CÓDIGO ORIGINAL) =====
+    const child = e.target.closest('.child');
+    const parent = e.target.closest('.parent');
+
+    if (child) {
+      dropdown.set(child.dataset.cod, child.dataset.label);
+      dropdown.close();
+      return;
+    }
+
+    if (parent && !isArrow) {
+      dropdown.set(parent.dataset.cod, parent.dataset.label);
+      dropdown.close();
+    }
+
+  });
+
+  /* ================================
+     UTIL FORM
+  ================================= */
+
+  function setFormValue(name, value) {
+
+    const input = form.querySelector(`[name="${name}"]`);
+    if (!input) return;
+
+    if (input.tagName === 'SELECT') {
+      input.value = value ?? '';
+      return;
+    }
+
+    if (input.type === 'checkbox') {
+      input.checked = Boolean(value);
+      return;
+    }
+
+    input.value = value ?? '';
+  }
+
+  function preencherFormulario(data) {
+
+    numeroOS.value = data.numero;
+    dropdown.set(data.centroCod, data.centroLabel);
+
+    form.action = `/lancamento/editar_os/${data.id}/`;
+
+    saveBtn.textContent = '💾 Salvar Alterações';
+    cancelBtn.style.display = 'inline-block';
+    deleteBtn.style.display = 'inline-block';
+
+    deleteBtn.href = `/lancamento/excluir/${data.id}/`;
+
+    Object.entries(data.campos).forEach(([k, v]) => {
+      setFormValue(k, v);
+    });
+  }
+
+  function resetForm() {
+
+    form.reset();
+    dropdown.set('', '');
+
+    saveBtn.textContent = '💾 Abrir OS';
+    cancelBtn.style.display = 'none';
+    deleteBtn.style.display = 'none';
+
+    form.action = window.URL_ABRIR_OS;
+    numeroOS.value = window.PROXIMO_NUMERO_OS;
+  }
+
+  cancelBtn.addEventListener('click', resetForm);
+
+  /* ================================
+     API
+  ================================= */
+
+  async function carregarOS(id, fallback) {
+
+    try {
+
+      const r = await fetch(`/lancamento/api/os/detalhes/${id}/`);
+      if (!r.ok) throw new Error();
+
+      const d = await r.json();
+
+      preencherFormulario({
+        id: d.id,
+        numero: d.numero_os,
+        centroCod: d.centro_custo?.id,
+        centroLabel: d.centro_custo?.label,
+        campos: {
+          descricao_os: d.descricao_os,
+          cliente: d.cliente,
+          motivo_intervencao: d.motivo_intervencao,
+          ssm: d.ssm
+        }
+      });
+
+    } catch {
+
+      if (fallback) preencherFormulario(fallback);
     }
   }
 
-  selected.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleList();
+  /* ================================
+     BOTÃO EDITAR
+  ================================= */
+
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+
+    btn.addEventListener('click', e => {
+
+      const tr = e.target.closest('tr');
+
+      carregarOS(tr.dataset.osId, {
+        id: tr.dataset.osId,
+        numero: tr.dataset.numeroOs,
+        centroCod: tr.dataset.centroCusto,
+        centroLabel: tr.dataset.centroLabel,
+        campos: {
+          descricao_os: tr.dataset.descricaoOs,
+          cliente: tr.dataset.cliente,
+          motivo_intervencao: tr.dataset.motivoIntervencao,
+          ssm: tr.dataset.ssm
+        }
+      });
+
+    });
+
   });
 
-  // fecha ao clicar fora
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.dropdown-container')) {
-      list.classList.add('hidden');
-      list.setAttribute('aria-hidden', 'true');
+  /* ================================
+     EXCLUIR
+  ================================= */
+
+  deleteBtn.addEventListener('click', e => {
+
+
+
+    e.preventDefault();
+
+    if (confirm('Deseja excluir esta OS?')) {
+      window.location.href = deleteBtn.href;
     }
   });
 
-  // delegação de eventos para abrir/fechar e selecionar
-  list.addEventListener('click', (e) => {
-    const parentItem = e.target.closest('.dropdown-item.parent');
-    const childItem = e.target.closest('.dropdown-item.child');
-
-    // selecionar child
-    if (childItem) {
-      const cod = childItem.dataset.cod;
-      const label = childItem.dataset.label || childItem.querySelector('.text')?.textContent.trim();
-      hiddenInput.value = cod;
-      selected.textContent = label;
-      toggleList(false);
-      return;
-    }
-
-    // clicar no texto do parent seleciona o parent
-    if (parentItem) {
-      const clickedElem = e.target;
-      const isArrow = clickedElem.classList.contains('arrow');
-      const parentCod = parentItem.dataset.cod;
-      const parentLabel = parentItem.dataset.label || parentItem.querySelector('.text')?.textContent.trim();
-      const childrenDiv = document.getElementById(`children-${parentCod}`);
-
-      // se clicou na flecha → toggle expandir/recolher; ao expandir fecha outros
-      if (isArrow) {
-        // fecha outros abertos
-        document.querySelectorAll('.dropdown-children').forEach(div => {
-          if (div !== childrenDiv) {
-            div.classList.add('hidden');
-            const prev = div.previousElementSibling;
-            if (prev && prev.classList.contains('parent')) {
-              prev.setAttribute('aria-expanded', 'false');
-              const arrow = prev.querySelector('.arrow');
-              if (arrow) arrow.textContent = '▶';
-            }
-          }
-        });
-
-        if (!childrenDiv) return;
-        const nowHidden = childrenDiv.classList.toggle('hidden');
-        parentItem.setAttribute('aria-expanded', String(!nowHidden));
-        const arrow = parentItem.querySelector('.arrow');
-        if (arrow) arrow.textContent = nowHidden ? '▶' : '▼';
-        return;
-      }
-
-      // se clicou no texto do pai → seleciona o pai
-      hiddenInput.value = parentCod;
-      selected.textContent = parentLabel;
-      toggleList(false);
-      return;
-    }
-  });
-
-  // keyboard
-  selected.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      toggleList();
-    }
-  });
-
-  list.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      toggleList(false);
-      selected.focus();
-    }
-  });
 });

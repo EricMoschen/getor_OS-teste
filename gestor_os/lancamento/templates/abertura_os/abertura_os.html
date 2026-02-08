@@ -86,23 +86,23 @@
         </thead>
         <tbody>
           {% for o in ordens %}
-          <tr data-os-id="{{ o.pk }}" data-numero-os="{{ o.numero_os }}" data-descricao_os="{{ o.descricao_os }}"
-            data-cliente="{{ o.cliente.pk|stringformat:'s' }}" data-cliente-label="{{ o.cliente.nome }}"
-            data-motivo_intervencao="{{ o.motivo_intervencao.pk|stringformat:'s' }}"
-            data-motivo-label="{{ o.motivo_intervencao.descricao }}" data-ssm="{{ o.ssm }}"
-            data-responsavel="{{ o.responsavel }}" data-prioridade="{{ o.prioridade }}" data-situacao="{{ o.situacao }}"
-            data-centro-custo="{{ o.centro_custo.cod_centro }}" data-centro-label="{{ o.centro_custo.descricao }}">
+          <tr data-os-id="{{ o.pk }}" data-numero-os="{{ o.numero_os }}" data-descricao-os="{{ o.descricao_os }}"
+            data-cliente="{{ o.cliente.pk|default:'' }}"
+            data-motivo-intervencao="{{ o.motivo_intervencao.pk|default:'' }}" data-ssm="{{ o.ssm }}"
+            data-situacao="{{ o.situacao }}" data-centro-custo="{{ o.centro_custo.cod_centro }}"
+            data-centro-label="{{ o.centro_custo.descricao }}">
             <td>{{ o.numero_os }}</td>
             <td>{{ o.descricao_os }}</td>
             <td>{{ o.cliente }}</td>
             <td>{{ o.get_situacao_display }}</td>
             <td>
-              <a href="{% url 'editar_os' o.pk %}" target="_blank" class="edit-btn">✏️</a>
-              <a href="{% url 'imprimir_os' o.pk %}" target="_blank" class="print-btn">🖨️</a>
+              <button type="button" class="edit-btn">✏️</button>
+              <a href="{% url 'imprimir_os' o.pk %}" target="_blank">🖨️</a>
             </td>
           </tr>
           {% endfor %}
         </tbody>
+
       </table>
       {% else %}
       <p>Nenhuma OS cadastrada ainda.</p>
@@ -111,108 +111,12 @@
   </div>
 </div>
 
-<script src="{% static 'js/abrir_os.js' %}"></script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const formTitle = document.querySelector('.abrir-os h2');
-    const saveBtn = document.querySelector('.save-btn');
-    const form = document.querySelector('.abrir-os form');
-    const numeroOS = document.getElementById('numero_os');
-    const hiddenInput = document.getElementById('centro_custo');
-    const selected = document.getElementById('dropdownSelected');
-    const deleteBtn = document.querySelector('.delete-btn');
-    const cancelBtn = document.querySelector('.cancel-btn');
-
-    // === Função: preencher formulário para edição ===
-    function preencherFormulario(osData) {
-      if (formTitle) {
-        formTitle.textContent = 'Editar OS';
-      }
-      saveBtn.textContent = '💾 Salvar Alterações';
-      numeroOS.value = osData.numero;
-      hiddenInput.value = osData.centroCod;
-      selected.textContent = osData.centroLabel;
-      form.action = `/lancamento/editar_os/${osData.id}/`;
-      deleteBtn.href = `/lancamento/excluir/${osData.id}/`;
-      deleteBtn.style.display = 'inline-block';
-      cancelBtn.style.display = 'inline-block';
-
-      // Preenche os campos do form
-      for (const [key, value] of Object.entries(osData.campos)) {
-        const input = form.querySelector(`[name="${key}"]`);
-        if (!input) continue;
-        const safeValue = value?? '';
-
-        if (input.tagName === 'SELECT') {
-          input.value = safeValue.toString();
-        } else if (input.type === 'checkbox') {
-          input.checked = Boolean(safeValue);
-        } else {
-          input.value = safeValue;
-        }
-      }
-
-      // Ajuste específico: selects cliente e motivo
-      const clienteSelect = form.querySelector('select[name="cliente"]');
-      const motivoSelect = form.querySelector('select[name="motivo_intervencao"]');
-      if (clienteSelect && osData.campos.cliente) {
-        clienteSelect.value = osData.campos.cliente;
-      } else if (clienteSelect) {
-        clienteSelect.value = "";
-      }
-    }
-    if (motivoSelect) {
-      motivoSelect.value = (osData.campos.motivo_intervencao ?? '').toString();
-    }
-
-    // === Função: cancelar edição ===
-    cancelBtn.addEventListener('click', () => {
-      if(formTitle){
-        formTitle.textContent = 'Abrir OS';
-      }
-      saveBtn.textContent = '💾 Abrir OS';
-      numeroOS.value = '{{ proximo_numero }}';
-      hiddenInput.value = '';
-      selected.textContent = 'Selecione um centro de custo';
-      form.action = '{% url "abrir_os" %}';
-      deleteBtn.style.display = 'none';
-      cancelBtn.style.display = 'none';
-      form.reset();
-    });
-
-    // === Botão editar ===
-    document.querySelectorAll('.os-table tbody .edit-btn').forEach(btn => {
-      btn.addEventListener('click', e => {
-        const tr = e.target.closest('tr');
-        const osData = {
-          id: tr.dataset.osId,
-          numero: tr.dataset.numeroOs,
-          centroCod: tr.dataset.centroCusto,
-          centroLabel: tr.dataset.centroLabel,
-          campos: {
-            descricao_os: tr.dataset.descricao_os,
-            cliente: tr.dataset.cliente || null,
-            motivo_intervencao: tr.dataset.motivo_intervencao || '',
-            ssm: tr.dataset.ssm || '',
-            responsavel: tr.dataset.responsavel || '',
-            prioridade: tr.dataset.prioridade || '',
-            situacao: tr.dataset.situacao || ''
-          }
-        };
-        preencherFormulario(osData);
-      });
-    });
-
-    // === Botão excluir com confirmação ===
-    deleteBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (confirm("Tem certeza que deseja excluir esta OS?") && deleteBtn.href) {
-        window.location.href = deleteBtn.href;
-      }
-    });
-
-  });
+  window.PROXIMO_NUMERO_OS = "{{ proximo_numero }}";
+  window.URL_ABRIR_OS = "{% url 'abrir_os' %}";
 </script>
 
-{% endblock %}
+<script src="{% static 'js/abrir_os.js' %}"></script>
+
+{% endblock %}]

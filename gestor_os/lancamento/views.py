@@ -247,4 +247,24 @@ def api_os(request, numero):
             "descricao": os_obj.descricao_os,
         })
     except AberturaOS.DoesNotExist:
-        raise Http404("OS não encontrada")
+         raise Http404("OS não encontrada")
+
+
+def api_os_detalhes(request, pk):
+    os_obj = get_object_or_404(
+        AberturaOS.objects.select_related("centro_custo", "cliente", "motivo_intervencao"),
+        pk=pk,
+    )
+    return JsonResponse({
+        "id": os_obj.id,
+        "numero_os": os_obj.numero_os,
+        "descricao_os": os_obj.descricao_os,
+        "centro_custo": {
+            "id": os_obj.centro_custo.pk if os_obj.centro_custo else None,
+            "label": os_obj.centro_custo.descricao if os_obj.centro_custo else "",
+        },
+        "cliente": os_obj.cliente.pk if os_obj.cliente else None,
+        "motivo_intervencao": os_obj.motivo_intervencao.pk if os_obj.motivo_intervencao else None,
+        "ssm": os_obj.ssm,
+        "situacao": os_obj.situacao,
+    })
