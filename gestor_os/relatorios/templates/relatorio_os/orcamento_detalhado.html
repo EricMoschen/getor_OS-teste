@@ -4,7 +4,6 @@
 
 <head>
     <meta charset="UTF-8">
-
     <style>
         @page {
             size: A4;
@@ -29,7 +28,11 @@
             margin-bottom: 20px;
         }
 
-        .titulo h1 {
+        .header .empresa {
+            font-size: 10px;
+        }
+
+        .header .titulo h1 {
             margin: 0;
             font-size: 20px;
         }
@@ -64,15 +67,11 @@
         th,
         td {
             border: 1px solid #bbb;
-            padding: 6px;
+            padding: 5px;
             text-align: center;
         }
 
-        .valor {
-            text-align: right;
-        }
-
-        .total-funcao {
+        .total-colab {
             text-align: right;
             font-weight: bold;
             margin-top: 5px;
@@ -101,92 +100,71 @@
             font-size: 10px;
         }
     </style>
-
 </head>
 
 <body>
 
-    <!-- HEADER -->
     <div class="header">
-
-        <div>
+        <div class="empresa">
             <img src="{{ logo_path }}" height="60">
             <p><b>Tévere LTDA</b></p>
             <p>CNPJ: 79.827.473/0001-17</p>
             <p>Acesso Leste, 1147</p>
             <p>(49) 3344-8600</p>
         </div>
-
         <div class="titulo">
-            <h1>ORÇAMENTO DE SERVIÇOS</h1>
+            <h1>Relatório de Horas</h1>
             <p>Emitido em: {{ data_emissao }}</p>
         </div>
-
     </div>
 
-    <!-- INFO OS -->
     <div class="info-os">
         <p><b>OS:</b> {{ os.numero_os }}</p>
         <p><b>Cliente:</b> {{ os.cliente }}</p>
         <p><b>Descrição:</b> {{ os.descricao_os }}</p>
-
         {% if data_inicio or data_fim %}
         <p><b>Período:</b> {{ data_inicio|default:"--" }} até {{ data_fim|default:"--" }}</p>
         {% endif %}
     </div>
 
-
-    <!-- LISTAGEM POR FUNÇÃO -->
-    {% for funcao in funcoes %}
-
+    {% for colab in colaboradores %}
     <div class="card">
-
-        <h3>Função: {{ funcao.nome }}</h3>
-
+        <h3>{{ colab.colaborador.nome }}</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Descrição</th>
-                    <th>Horas</th>
-                    <th>Valor Hora (R$)</th>
-                    <th>Total (R$)</th>
+                    <th>Data</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Duração</th>
                 </tr>
             </thead>
-
             <tbody>
-
-                {% for item in funcao.itens %}
+                {% for ap in colab.apontamentos %}
                 <tr>
-                    <td>{{ item.descricao }}</td>
-                    <td>{{ item.horas }}</td>
-                    <td class="valor">{{ item.valor_hora }}</td>
-                    <td class="valor">{{ item.total }}</td>
+                    <td>{{ ap.data }}</td>
+                    <td>{{ ap.inicio }}</td>
+                    <td>{{ ap.fim }}</td>
+                    <td>{{ ap.duracao }}</td>
                 </tr>
                 {% endfor %}
-
             </tbody>
         </table>
-
-        <div class="total-funcao">
-            Total Função: R$ {{ funcao.total_funcao }}
+        <div class="total-colab">
+            Total colaborador: {{ colab.total_fmt }}
         </div>
-
     </div>
-
     {% endfor %}
 
-
-    <!-- TOTAL GERAL -->
     <div class="total-geral">
-        TOTAL GERAL: R$ {{ total_geral }}
+        TOTAL GERAL: {{ total_geral }}
     </div>
 
-
-    <!-- ASSINATURA -->
     <div class="assinatura">
         <div class="ass-box">Responsável Técnico</div>
         <div class="ass-box">Cliente</div>
     </div>
 
 </body>
+
 </html>

@@ -1,111 +1,173 @@
-{% extends "base.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
 
-{% block body %}
+<title>Orçamento OS {{ os_detalhes.numero_os }}</title>
 
-<div class="container">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
 
-<h2 class="titulo">Relatório de Horas por OS</h2>
+<style>
+@media print {
+    .no-print { display: none; }
+}
 
-<form method="GET" class="filtro-box">
+table th, table td {
+    border: 2px solid #3a3a3a;
+}
 
-    <div class="form-group">
-        <label>Número da OS</label>
-        <input type="text" name="os" class="input-field"
-               value="{{ filtro_os }}">
+thead th {
+    background-color: #9ca3af;
+    font-weight: 700;
+    color: #111827;
+}
+
+.col-normal-title { background: #15803d; color: #fff; }
+.col-50-title     { background: #ca8a04; color: #fff; }
+.col-100-title    { background: #b91c1c; color: #fff; }
+.col-total-title  { background: #6b7280; color: #fff; }
+
+.col-normal { background: #dcfce7; }
+.col-50     { background: #fef9c3; }
+.col-100    { background: #fee2e2; }
+
+.box-total {
+    padding: 10px 16px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+<div class="max-w-7xl mx-auto bg-white shadow-xl rounded-2xl p-8">
+
+<!-- ================= CABEÇALHO ================= -->
+<div class="flex justify-between mb-6">
+
+    <div>
+        <img src="{% static 'img/tevere_logo.png' %}" class="h-16 mb-2">
+        <p><b>Empresa:</b> Tévere LTDA</p>
+        <p><b>CNPJ:</b> 79.827.473/0001-17</p>
+        <p><b>Endereço:</b> Acesso Leste, 1147</p>
+        <p><b>Telefone:</b> (49) 3344-8600</p>
     </div>
 
-    <div class="form-group">
-        <label>Data Início</label>
-        <input type="date" name="data_inicio"
-               class="input-field"
-               value="{{ data_inicio|date:'Y-m-d' }}">
+    <div class="text-right">
+        <p class="text-xl font-bold">
+            Orçamento Nº {{ numero_orcamento|default:"—" }}
+        </p>
+        <p><b>Data:</b> {{ now|date:"d/m/Y" }}</p>
     </div>
 
-    <div class="form-group">
-        <label>Data Fim</label>
-        <input type="date" name="data_fim"
-               class="input-field"
-               value="{{ data_fim|date:'Y-m-d' }}">
-    </div>
-
-    <button class="btn-primary">Buscar</button>
-
-    {% if relatorio %}
-        <a href="?os={{ filtro_os }}&data_inicio={{ data_inicio }}&data_fim={{ data_fim }}&export_pdf=1"
-           target="_blank"
-           class="btn-secondary">
-           Orçamento Geral
-        </a>
-    {% endif %}
-
-    {% if os_detalhes %}
-        <a href="{% url 'log_os_pdf' os_detalhes.numero_os %}"
-           target="_blank"
-           class="btn-secondary">
-           PDF Detalhado
-        </a>
-    {% endif %}
-
-</form>
-
-
-{% if os_detalhes %}
-<div class="box-info">
-    <p><strong>OS:</strong> {{ os_detalhes.numero }}</p>
-    <p><strong>Descrição:</strong> {{ os_detalhes.descricao }}</p>
-    <p><strong>Cliente:</strong> {{ os_detalhes.cliente }}</p>
-    <p><strong>Motivo:</strong> {{ os_detalhes.motivo }}</p>
 </div>
-{% endif %}
 
+<hr class="border-gray-700 mb-6">
 
-{% if relatorio %}
+<!-- ================= DADOS DA OS ================= -->
+<div class="grid grid-cols-2 gap-2 mb-6">
 
-<div class="table-box">
-<table class="tabela">
+    <p><b>Número da OS:</b> {{ os_detalhes.numero_os }}</p>
+    <p><b>Cliente:</b> {{ os_detalhes.cliente }}</p>
+
+    <p class="col-span-2">
+        <b>Descrição:</b> {{ os_detalhes.descricao_os }}
+    </p>
+
+    {% if data_inicio or data_fim %}
+    <p class="col-span-2">
+        <b>Período:</b>
+        {{ data_inicio|date:"d/m/Y" }} até {{ data_fim|date:"d/m/Y" }}
+    </p>
+    {% endif %}
+
+</div>
+
+<!-- ================= TABELA ================= -->
+<table class="w-full text-sm border border-gray-700">
 
 <thead>
 <tr>
-    <th>Matrícula</th>
-    <th>Colaborador</th>
-    <th>Horas Normais</th>
-    <th>Horas 50%</th>
-    <th>Horas 100%</th>
-    <th>Total Geral</th>
+    <th class="p-2">Função</th>
+    <th class="p-2">Valor Hora R$</th>
+    <th class="p-2 col-normal-title">Horas Normais</th>
+    <th class="p-2 col-50-title">Horas 50%</th>
+    <th class="p-2 col-100-title">Horas 100%</th>
+    <th class="p-2 col-total-title">Total Horas</th>
 </tr>
 </thead>
 
 <tbody>
-{% for r in relatorio %}
+
+{% for item in relatorio %}
 <tr>
-    <td>{{ r.matricula }}</td>
-    <td>{{ r.nome }}</td>
-    <td>{{ r.horas_normais_fmt }}</td>
-    <td>{{ r.horas_50_fmt }}</td>
-    <td>{{ r.horas_100_fmt }}</td>
-    <td class="total">{{ r.total_fmt }}</td>
+
+    <td class="p-2">{{ item.nome }}</td>
+    <td class="p-2">Valor hora&</td>
+    <td class="p-2 col-normal text-center">
+        {{ item.horas_normais_fmt }}
+    </td>
+
+    <td class="p-2 col-50 text-center">
+        {{ item.horas_50_fmt }}
+    </td>
+
+    <td class="p-2 col-100 text-center">
+        {{ item.horas_100_fmt }}
+    </td>
+
+    <td class="p-2 font-bold text-center">
+        {{ item.total_fmt }}
+    </td>
+
+</tr>
+{% empty %}
+<tr>
+    <td colspan="6" class="text-center p-4">
+        Nenhum apontamento encontrado para este filtro.
+    </td>
 </tr>
 {% endfor %}
+
 </tbody>
-
-<tfoot>
-<tr class="total-geral">
-    <td colspan="2"><strong>TOTAL</strong></td>
-    <td>{{ totais.normais }}</td>
-    <td>{{ totais.extra50 }}</td>
-    <td>{{ totais.extra100 }}</td>
-    <td>{{ totais.geral }}</td>
-</tr>
-</tfoot>
-
 </table>
-</div>
 
-{% else %}
-<p class="alert">Nenhum apontamento encontrado.</p>
+<!-- ================= TOTAIS ================= -->
+{% if totais %}
+<div class="flex justify-end gap-4 mt-6">
+
+    <div class="box-total bg-green-100">
+        Normais: {{ totais.normais }}
+    </div>
+
+    <div class="box-total bg-yellow-100">
+        50%: {{ totais.extra50 }}
+    </div>
+
+    <div class="box-total bg-red-100">
+        100%: {{ totais.extra100 }}
+    </div>
+
+    <div class="box-total bg-blue-100">
+        Total Geral: {{ totais.geral }}
+    </div>
+
+</div>
 {% endif %}
 
+<!-- ================= BOTÃO ================= -->
+<div class="text-right mt-6 no-print">
+    <button onclick="window.print()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl shadow">
+        Imprimir
+    </button>
 </div>
 
-{% endblock %}
+</div>
+
+</body>
+</html>
