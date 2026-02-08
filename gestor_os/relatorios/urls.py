@@ -9,6 +9,7 @@ urlpatterns = [
 
     # Rota para Relatorios OS
     path("relatorio-os/", views.relatorio_os, name="relatorio_os"),
+    path("relatorio-os/orcamento-pdf/", views.orcamento_pdf, name="orcamento_pdf"),
 
 
     path("proximo_orcamento/", views.proximo_orcamento, name="proximo_orcamento"),

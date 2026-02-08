@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert.remove();
       }, 500);
 
-    }, 4000); // 4 segundos
+    }, 6000); // 6 segundos
 
   });
 

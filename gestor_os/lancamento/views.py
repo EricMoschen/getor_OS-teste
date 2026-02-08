@@ -154,34 +154,15 @@ def apontar_horas(request):
             ).order_by('-data_inicio').first()
 
             if aberto:
-                data_aberto = timezone.localtime(aberto.data_inicio).date()
-                data_hoje = agora.date()
-
-                hr_inicio_turno = colaborador.calcular_horario_inicio_turno()
-                hr_fim_turno = colaborador.calcular_horario_fim_turno()
-                hora_atual = agora.time()
-                if hr_inicio_turno <= hr_fim_turno:
-                    dentro_turno = hr_inicio_turno <= hora_atual <= hr_fim_turno
-                else:
-                    dentro_turno = hora_atual >= hr_inicio_turno or hora_atual <= hr_fim_turno
-
-
-                # Se OS anterior não for do mesmo dia e não estiver dentro do turno → erro
-                if data_aberto != data_hoje and not dentro_turno:
+                try:
+                    ApontamentoHoras.encerrar_aberto(colaborador)
+                except ValueError as e:
                     messages.error(
                         request,
-                        f"Erro de Hora Extra! A OS {aberto.ordem_servico.numero_os} - "
-                        f"{colaborador.matricula} - {colaborador.nome} está em aberto. "
-                        "Encerre-a antes de iniciar nova OS."
+                        f"Erro! A OS {aberto.ordem_servico.numero_os} está em aberto. {e} "
+                        "Verifique com o responsável antes de iniciar uma nova OS."
                     )
                     return redirect("apontar_horas")
-                else:
-                    # Encerra OS aberta
-                    try:
-                        ApontamentoHoras.encerrar_aberto(colaborador)
-                    except ValueError as e:
-                        messages.error(request, str(e))
-                        return redirect("apontar_horas")
 
             # Classifica tipo de dia
             tipo_dia = ApontamentoHoras.classificar_tipo_dia(agora.date())
@@ -249,6 +230,25 @@ def api_os(request, numero):
     except AberturaOS.DoesNotExist:
          raise Http404("OS não encontrada")
 
+         
+def api_os_detalhes(request, pk):
+    os_obj = get_object_or_404(
+        AberturaOS.objects.select_related("centro_custo", "cliente", "motivo_intervencao"),
+        pk=pk,
+    )
+    return JsonResponse({
+        "id": os_obj.id,
+        "numero_os": os_obj.numero_os,
+        "descricao_os": os_obj.descricao_os,
+        "centro_custo": {
+            "id": os_obj.centro_custo.pk if os_obj.centro_custo else None,
+            "label": os_obj.centro_custo.descricao if os_obj.centro_custo else "",
+        },
+        "cliente": os_obj.cliente.pk if os_obj.cliente else None,
+        "motivo_intervencao": os_obj.motivo_intervencao.pk if os_obj.motivo_intervencao else None,
+        "ssm": os_obj.ssm,
+        "situacao": os_obj.situacao,
+    })
 
 def api_os_detalhes(request, pk):
     os_obj = get_object_or_404(

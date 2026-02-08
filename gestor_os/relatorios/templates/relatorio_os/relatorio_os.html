@@ -30,16 +30,16 @@
         <button type="submit" class="btn-primary">Buscar</button>
 
         {% if os_detalhes %}
-        <a href="{% url 'log_os_pdf' os_detalhes.numero_os %}?{% if data_inicio %}data_inicio={{ data_inicio|date:'Y-m-d' }}&{% endif %}{% if data_fim %}data_fim={{ data_fim|date:'Y-m-d' }}{% endif %}"
+        <a href="{% url 'orcamento_pdf' %}?os={{ os_detalhes.numero_os }}{% if data_inicio %}&data_inicio={{ data_inicio|date:'Y-m-d' }}{% endif %}{% if data_fim %}&data_fim={{ data_fim|date:'Y-m-d' }}{% endif %}"
             target="_blank" class="btn-secondary">
-            PDF Detalhado
+            Orçamento PDF
         </a>
         {% endif %}
 
         {% if os_detalhes %}
         <a href="{% url 'log_os_pdf' os_detalhes.numero_os %}?{% if data_inicio %}data_inicio={{ data_inicio|date:'Y-m-d' }}&{% endif %}{% if data_fim %}data_fim={{ data_fim|date:'Y-m-d' }}{% endif %}"
             target="_blank" class="btn-secondary">
-            PDF Detalhado
+            Horas Detalhadas PDF
         </a>
         {% endif %}
 
@@ -105,9 +105,10 @@
                     <td>{{ totais.normais }}</td>
                     <td>{{ totais.extra50 }}</td>
                     <td>{{ totais.extra100 }}</td>
-                    <td>{{ totais.geral }}</td>
+                    <td class="total">{{ totais.geral }}</td>
                 </tr>
             </tfoot>
+
             {% endif %}
 
         </table>

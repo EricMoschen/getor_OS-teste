@@ -179,12 +179,37 @@ class ApontamentoHoras(models.Model):
         if not aberto:
             raise ValueError("Nenhum apontamento aberto encontrado.")
 
-        agora = timezone.localtime()
+        inicio = timezone.localtime(aberto.data_inicio)
+        tipo_dia = cls.classificar_tipo_dia(inicio.date())
+        turno_inicio = colaborador.calcular_horario_inicio_turno()
+        turno_fim = colaborador.calcular_horario_fim_turno()
 
-        if aberto.data_inicio > agora:
-            raise ValueError("Horário de início maior que horário atual.")
+        if tipo_dia != "Dia Normal":
+            raise ValueError(
+                "Apontamento fora do horário normal. Encerramento deve ser feito manualmente."
+            )
 
-        aberto.data_fim = agora
+        hora_inicio = inicio.time()
+        if turno_inicio <= turno_fim:
+            dentro_turno = turno_inicio <= hora_inicio <= turno_fim
+            fim_turno_date = inicio.date()
+        else:
+            dentro_turno = hora_inicio >= turno_inicio or hora_inicio <= turno_fim
+            fim_turno_date = inicio.date()
+            if hora_inicio <= turno_fim:
+                fim_turno_date = fim_turno_date + timedelta(days=1)
+
+        if not dentro_turno:
+            raise ValueError(
+                "Apontamento fora do horário normal. Encerramento deve ser feito manualmente."
+            )
+
+        fim_turno = datetime.combine(fim_turno_date, turno_fim)
+        fim_turno = timezone.make_aware(fim_turno)
+        if fim_turno < inicio:
+            raise ValueError("Horário de término do turno inválido para encerramento automático.")
+
+        aberto.data_fim = fim_turno
         aberto.save(update_fields=["data_fim"])
 
         return aberto

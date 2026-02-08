@@ -23,11 +23,7 @@ seguindo o mesmo modelo do Intervenção
         - Modulo de Cadastro de Colaborador ✅
  
 
-- verificar edição das Abertura das OS ( Não esta puchando os dado para edição)
-
-- incluir para que no Relatório das OS as horas devem aparecer somdas apartir do dia 20 de cada mes
-( quado for dia 20 ele zera as horas e começa somar apartir ate o dia 20 do proximo mes)
-
+- verificar edição das Abertura das OS ( Não esta puchando os dado para edição) ✅
 
 
 - verificar o fechamento aotomatico das horas quando não informado o horario de saida, ele deve encerar 
@@ -36,9 +32,15 @@ com o horario do turno do colaborador:
  caso seja encerada manualmente ele mantem a hora informada manualmente.
  - se for sabados, domingos, feriados, ou fora do horario de expediente, e não for encerada manualmente ele deve
  quando for lançar outra hora para este colaborador ele deve dar uma mensagem de erro de que a os não foi finalizada e deve 
- verificar com o Responsavel para corrigir.
+ verificar com o Responsavel para corrigir.✅
+
 
  - Corrigir erros na geração dos Orçamentos em PDF, ele não esta mantendo os intervalos das datas quando gera 
- os PDFs, está puchando todo o periodo e não apenas do intervalo de informado 
+ os PDFs, está puchando todo o periodo e não apenas do intervalo de informado ✅
 
- - vericar formato das horas no Orçamentos dem PDF, esta retornando decimais em vez de Horas, formato hh:mm
+ - vericar formato das horas no Orçamentos dem PDF, esta retornando decimais em vez de Horas, formato hh:mm ✅
+
+
+
+ - incluir para que no Relatório das OS as horas devem aparecer somdas apartir do dia 20 de cada mes
+( quado for dia 20 ele zera as horas e começa somar apartir ate o dia 20 do proximo mes)
