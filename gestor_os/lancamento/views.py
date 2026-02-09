@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, Http404
+from django.contrib.auth.decorators import login_required
 from .models import ApontamentoHoras, Colaborador, AberturaOS
 from cadastro.models import CentroCusto
 from .forms import AberturaOSForm
@@ -8,6 +9,7 @@ from django.contrib import messages
 from datetime import time, datetime
 import holidays
 
+from gestor_os.access import APONTAMENTO_HORAS_GROUP, LANCAMENTO_GROUP, group_required
 
 # Função auxiliar — retorna apenas os centros de custo "pais"
 def get_pais_centro_custo():
@@ -15,6 +17,8 @@ def get_pais_centro_custo():
 
 
 # --- Abrir / Criar OS ---
+@login_required
+@group_required(LANCAMENTO_GROUP)
 def abrir_os(request):
     proximo_numero = AberturaOS.proximo_numero_os()
 
@@ -54,6 +58,8 @@ def abrir_os(request):
 
 
 # --- Editar OS ---
+@login_required
+@group_required(LANCAMENTO_GROUP)
 def editar_os(request, pk):
     os_instance = get_object_or_404(AberturaOS, pk=pk)
 
@@ -80,6 +86,8 @@ def editar_os(request, pk):
 
 
 # --- Excluir OS ---
+@login_required
+@group_required(LANCAMENTO_GROUP)
 def excluir_os(request, pk):
     os_obj = get_object_or_404(AberturaOS, pk=pk)
     os_obj.delete()
@@ -87,6 +95,8 @@ def excluir_os(request, pk):
 
 
 # --- AJAX para carregar subcentros ---
+@login_required
+@group_required(LANCAMENTO_GROUP)
 def get_subcentros(request):
     pai_id = request.GET.get('pai_id')
     filhos = CentroCusto.objects.filter(centro_pai_id=pai_id).order_by('descricao')
@@ -96,6 +106,8 @@ def get_subcentros(request):
 
 
 # --- Folha de Impressão de OS ---
+@login_required
+@group_required(LANCAMENTO_GROUP)
 def imprimir_os(request, pk):
     """
     Exibe a página de impressão da OS selecionada.
@@ -117,6 +129,8 @@ def imprimir_os(request, pk):
 
 BR_HOLIDAYS = holidays.Brazil()  # Para verificar feriados
 
+@login_required
+@group_required(LANCAMENTO_GROUP, APONTAMENTO_HORAS_GROUP)
 def apontar_horas(request):
     if request.method == "POST":
         matricula = request.POST.get("matricula", "").strip().upper()
@@ -205,6 +219,8 @@ def apontar_horas(request):
 # =============================
 # APIs auxiliares
 # =============================
+@login_required
+@group_required(LANCAMENTO_GROUP, APONTAMENTO_HORAS_GROUP)
 def api_colaborador(request, matricula):
     try:
         colaborador = Colaborador.objects.get(matricula__iexact=matricula)
@@ -218,7 +234,8 @@ def api_colaborador(request, matricula):
     except Colaborador.DoesNotExist:
         raise Http404("Colaborador não encontrado")
 
-
+@login_required
+@group_required(LANCAMENTO_GROUP, APONTAMENTO_HORAS_GROUP)
 def api_os(request, numero):
     try:
         os_obj = AberturaOS.objects.get(numero_os__iexact=numero)
@@ -230,7 +247,8 @@ def api_os(request, numero):
     except AberturaOS.DoesNotExist:
          raise Http404("OS não encontrada")
 
-         
+@login_required
+@group_required(LANCAMENTO_GROUP, APONTAMENTO_HORAS_GROUP)      
 def api_os_detalhes(request, pk):
     os_obj = get_object_or_404(
         AberturaOS.objects.select_related("centro_custo", "cliente", "motivo_intervencao"),
@@ -250,21 +268,3 @@ def api_os_detalhes(request, pk):
         "situacao": os_obj.situacao,
     })
 
-def api_os_detalhes(request, pk):
-    os_obj = get_object_or_404(
-        AberturaOS.objects.select_related("centro_custo", "cliente", "motivo_intervencao"),
-        pk=pk,
-    )
-    return JsonResponse({
-        "id": os_obj.id,
-        "numero_os": os_obj.numero_os,
-        "descricao_os": os_obj.descricao_os,
-        "centro_custo": {
-            "id": os_obj.centro_custo.pk if os_obj.centro_custo else None,
-            "label": os_obj.centro_custo.descricao if os_obj.centro_custo else "",
-        },
-        "cliente": os_obj.cliente.pk if os_obj.cliente else None,
-        "motivo_intervencao": os_obj.motivo_intervencao.pk if os_obj.motivo_intervencao else None,
-        "ssm": os_obj.ssm,
-        "situacao": os_obj.situacao,
-    })

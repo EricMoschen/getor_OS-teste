@@ -1,72 +1,80 @@
 {% extends "base.html" %}
 {% load static %}
+{% load permissions %}
 
 {% block head %}
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 {% endblock head %}
 
 {% block body %}
 <div class="dashboard-container">
 
-    <h1 class="dashboard-title">Painel de Abertura</h1>
+    {% if user|has_any_group:"Administrador,Lancamento,ApontamentoHoras" %}
+        <h1 class="dashboard-title">Painel de Abertura</h1>
 
-    <div class="dashboard-grid">
+        <div class="dashboard-grid">
 
-         <!-- Abertura de Ordens de serviço -->
-        <a href="{% url 'abrir_os' %}" class="dashboard-card color-blue">
-            <h2 class="card-title">Abrir OS</h2>
-        </a>
+             <!-- Abertura de Ordens de serviço -->
+            {% if user|has_any_group:"Administrador,Lancamento" %}
+                <a href="{% url 'abrir_os' %}" class="dashboard-card color-blue">
+                    <h2 class="card-title">Abrir OS</h2>
+                </a>
+            {% endif %}
 
-         <!-- Apontamento de horas -->
-        <a href="{% url 'apontar_horas' %}" class="dashboard-card color-green">
-            <h2 class="card-title">Apontar Horas</h2>
-        </a>
+             <!-- Apontamento de horas -->
+            {% if user|has_any_group:"Administrador,Lancamento,ApontamentoHoras" %}
+                <a href="{% url 'apontar_horas' %}" class="dashboard-card color-green">
+                    <h2 class="card-title">Apontar Horas</h2>
+                </a>
+            {% endif %}
 
-    </div>
-    <br/>
+        </div>
+        <br/>
+    {% endif %}
 
-    <h1 class="dashboard-title">Painel de Relatórios</h1>
+    {% if user|has_any_group:"Administrador,Relatorios" %}
+        <h1 class="dashboard-title">Painel de Relatórios</h1>
 
-    <div class="dashboard-grid">
+        <div class="dashboard-grid">
 
-         <!-- Finalizar OS -->
-        <a href="{% url 'finalizar_os' %}" class="dashboard-card color-blue">
-            <h2 class="card-title">Finalizar OS</h2>
-        </a>
+             <!-- Finalizar OS -->
+            <a href="{% url 'finalizar_os' %}" class="dashboard-card color-blue">
+                <h2 class="card-title">Finalizar OS</h2>
+            </a>
 
-         <!-- Finalizar OS -->
-        <a href="{% url 'relatorio_os' %}" class="dashboard-card color-blue">
-            <h2 class="card-title">Relatório OS</h2>
-        </a>
-    </div>
+             <!-- Finalizar OS -->
+            <a href="{% url 'relatorio_os' %}" class="dashboard-card color-blue">
+                <h2 class="card-title">Relatório OS</h2>
+            </a>
+        </div>
+    {% endif %}
 
-    <h1 class="dashboard-title">Painel de Cadastros</h1>
+    {% if user|has_any_group:"Administrador,Cadastro" %}
+        <h1 class="dashboard-title">Painel de Cadastros</h1>
 
-    <div class="dashboard-grid">
+        <div class="dashboard-grid">
 
-        <!-- Cadastro de Centro de Custos -->
-        <a href="{% url 'cadastrar_centro_custo' %}" class="dashboard-card color-purple">
-            <h2 class="card-title">Centro de Custos</h2>
-        </a>
+            <!-- Cadastro de Centro de Custos -->
+            <a href="{% url 'cadastrar_centro_custo' %}" class="dashboard-card color-purple">
+                <h2 class="card-title">Centro de Custos</h2>
+            </a>
 
-        <!-- Cadastro de Clientes -->
-        <a href="{% url 'cadastro_cliente' %}" class="dashboard-card color-yellow">
-            <h2 class="card-title">Clientes</h2>
-        </a>
+            <!-- Cadastro de Clientes -->
+            <a href="{% url 'cadastro_cliente' %}" class="dashboard-card color-yellow">
+                <h2 class="card-title">Clientes</h2>
+            </a>
 
-         <!-- Cadastro de Intervenção -->
-        <a href="{% url 'cadastro_intervencao' %}" class="dashboard-card color-blue">
-            <h2 class="card-title">Intervenção</h2>
-        </a>
+             <!-- Cadastro de Intervenção -->
+            <a href="{% url 'cadastro_intervencao' %}" class="dashboard-card color-blue">
+                <h2 class="card-title">Intervenção</h2>
+            </a>
 
-        <!-- Cadastro de Colaborador -->
-        <a href="{% url 'cadastro_colaborador' %}" class="dashboard-card color-blue">
-            <h2 class="card-title">Colaborador</h2>
-        </a>
-    </div>
-    
+            <!-- Cadastro de Colaborador -->
+            <a href="{% url 'cadastro_colaborador' %}" class="dashboard-card color-blue">
+                <h2 class="card-title">Colaborador</h2>
+            </a>
+        </div>
+    {% endif %}
+
 </div>
-{% endblock %}
-
-
-
+{% endblock body %}

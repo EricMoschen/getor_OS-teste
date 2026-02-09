@@ -1,185 +1,276 @@
-================================================================================================================
-    Introdução  
-================================================================================================================
+========================================================================================================================
+DOCUMENTAÇÃO TÉCNICA E FUNCIONAL — GESTOR OS
+========================================================================================================================
 
- O Gestor OS é um sistema web desenvolvido para gerenciar todo o fluxo de Abertura de Ordens de Serviço (OS)
-e o Apontamento de Horas dos colaboradores, proporcionando maior controle operacional e financeiro para a 
-empresa.
+Sumário
+========================================================================================================================
+1. Visão geral
+2. Objetivos do sistema
+3. Tecnologias e dependências
+4. Arquitetura e estrutura do projeto
+5. Modelo de dados e relacionamentos
+6. Regras de negócio principais
+7. Funcionalidades por módulo
+8. Fluxos de uso (passo a passo)
+9. Relatórios e documentos
+10. APIs auxiliares (AJAX)
+11. Instalação e execução (ambiente local)
+12. Configurações relevantes
+13. Boas práticas operacionais
+14. Suporte e evolução
 
-O sistema permite o cadastro e gerenciamento dos principais elementos envolvidos no processo de prestação
-de serviços, incluindo:
+========================================================================================================================
+1. VISÃO GERAL
+========================================================================================================================
+O Gestor OS é um sistema web de gestão de Ordens de Serviço (OS) e Apontamento de Horas. Seu foco é organizar
+processos de manutenção/serviços, permitindo abertura, acompanhamento, encerramento e análise de custos de OS,
+com base no cadastro estruturado de clientes, centros de custo, intervenções e colaboradores.
 
-Clientes: onde os serviços serão executados.
+O sistema entrega:
+- Cadastro completo de entidades essenciais (Clientes, Centro de Custo, Intervenções e Colaboradores).
+- Controle de abertura e status das OS.
+- Registro de início/fim de apontamentos de horas por colaborador e OS.
+- Consolidação de horas por tipo de dia (normal, sábado, domingo/feriado).
+- Emissão de relatórios e documentos (incluindo PDFs via WeasyPrint).
 
-Centros de Custo: utilizados para organizar e direcionar as despesas de cada OS dentro da estrutura da 
-empresa.
+========================================================================================================================
+2. OBJETIVOS DO SISTEMA
+========================================================================================================================
+- Padronizar o fluxo de abertura e controle de ordens de serviço.
+- Garantir rastreabilidade das horas trabalhadas e custos de mão de obra.
+- Permitir análise detalhada por cliente, centro de custo e intervenção.
+- Gerar relatórios operacionais e orçamentos de forma rápida e confiável.
 
-Intervenções: classificações que definem o tipo da OS (ex.: Manutenção Preventiva, Manutenção Corretiva,
-Melhoria), auxiliando na análise e identificação dos serviços mais demandados.
+========================================================================================================================
+3. TECNOLOGIAS E DEPENDÊNCIAS
+========================================================================================================================
+Linguagens e Frameworks:
+- Python 3.x
+- Django 5.2.7
+- HTML5, CSS3, JavaScript
 
-Colaboradores: registrando dados como matrícula, turno de trabalho, setor e valor da hora, possibilitando 
-o cálculo detalhado dos custos de mão de obra por OS.
+Bibliotecas relevantes:
+- Jinja2 (engine de templates usada pelo Django)
+- Argon2-cffi (hash seguro de senhas)
+- Pillow (manipulação de imagens)
+- Holidays (feriados nacionais para cálculo de horas)
+- WeasyPrint (geração de PDF para relatórios)
 
-O objetivo do Gestor OS é oferecer uma plataforma prática, organizada e eficiente para registrar,
-acompanhar e analisar todas as atividades relacionadas às Ordens de Serviço, garantindo maior precisão 
-nos controles e mais agilidade nos processos internos.
+Banco de dados:
+- SQLite (padrão no desenvolvimento)
+- PostgreSQL (recomendado para produção)
 
+========================================================================================================================
+4. ARQUITETURA E ESTRUTURA DO PROJETO
+========================================================================================================================
+O projeto é organizado em apps Django, cada uma responsável por uma parte do domínio:
 
-================================================================================================================
-    Tecnologias Utilizadas 
-================================================================================================================
+/gestor_os/
+  ├─ cadastro/           -> Cadastros base (clientes, centros de custo, intervenções, colaboradores)
+  ├─ lancamento/         -> Abertura de OS, apontamento de horas e impressão
+  ├─ menu/               -> Dashboard inicial
+  ├─ relatorios/         -> Finalização, relatórios e logs
+  ├─ templates/          -> Templates base compartilhados
+  ├─ static/             -> Recursos estáticos (css, js, imagens)
+  ├─ db.sqlite3          -> Banco local (desenvolvimento)
+  └─ manage.py           -> Utilitário de gerenciamento
 
-================
-    Linguagens:
-================
+========================================================================================================================
+5. MODELO DE DADOS E RELACIONAMENTOS
+========================================================================================================================
+Entidades principais:
 
-Python 3.12 – Linguagem principal utilizada no backend.
+1) CentroCusto
+- cod_centro (PK)
+- descricao
+- centro_pai (auto-relacionamento para hierarquia)
 
-JavaScript – Utilizado para interações dinâmicas, validações, AJAX e UX.
+2) Cliente
+- cod_cliente (único)
+- nome_cliente
 
-HTML5 / CSS3 – Estrutura e estilização das páginas.
+3) Intervencao
+- cod_intervencao (PK)
+- descricao
 
+4) Colaborador
+- matricula (única)
+- nome
+- funcao
+- valor_hora
+- turno (A, B, HC, OUTROS)
+- horários personalizados quando turno = OUTROS
 
-======================================
-Frameworks e Bibliotecas Principais
-======================================
+5) AberturaOS
+- numero_os (gerado automaticamente)
+- descricao_os
+- centro_custo (FK)
+- cliente (FK opcional)
+- motivo_intervencao (FK)
+- ssm
+- situacao (AB = ativa / FI = finalizada)
+- data_abertura
+- observacoes (para finalização)
 
-Django 5.2.7
-Framework principal para criação da aplicação web, gerenciamento de rotas, autenticação, ORM e estrutura MVC.
+6) ApontamentoHoras
+- colaborador (FK)
+- ordem_servico (FK)
+- data_inicio
+- data_fim
+- tipo_dia (normal, sábado, domingo/feriado)
 
-Jinja2
-Motor de templates utilizado internamente pelo Django para renderização das páginas.
+Relacionamentos resumidos:
+- Cliente, CentroCusto e Intervencao podem possuir várias OS.
+- AberturaOS possui vários apontamentos de horas.
+- Colaborador pode ter vários apontamentos.
 
-TailwindCSS 
-Utilizado para estilização moderna, responsiva e produtividade no front-end.
+========================================================================================================================
+6. REGRAS DE NEGÓCIO PRINCIPAIS
+========================================================================================================================
+1) Geração automática do número da OS
+- Formato: NNN-AA (ex: 001-25)
+- Sequencial por ano corrente.
 
-Requests / Httpx
-Utilizados para requisições HTTP quando necessário.
+2) Status da OS
+- AB = Ativa
+- FI = Finalizada (não permite novos apontamentos)
 
-Argon2-cffi
-Biblioteca usada para hashing de senhas com alto nível de segurança.
+3) Apontamento de horas
+- Apenas um apontamento aberto por colaborador.
+- Ao iniciar nova OS, o sistema tenta encerrar automaticamente apontamentos anteriores dentro do turno.
+- Em dias não normais (sábado/domingo/feriado), encerramento automático é bloqueado.
 
-Pillow
-Utilizada para manipulação de imagens, quando aplicável.
+4) Cálculo de horas
+- Dia normal: horas normais dentro do turno; excedente é extra 50%.
+- Sábado: todo tempo é extra 50%.
+- Domingo/feriado: todo tempo é extra 100%.
 
-================
-Banco de Dados
-================
+========================================================================================================================
+7. FUNCIONALIDADES POR MÓDULO
+========================================================================================================================
 
-SQLite (ambiente de desenvolvimento)
-Banco de dados padrão do Django, simples e eficiente para desenvolvimento.
+7.1 Módulo Cadastro
+- Centro de custo hierárquico (pai/filho).
+- Clientes com código único.
+- Intervenções com numeração automática.
+- Colaboradores com turno padrão ou horários personalizados.
 
-PostgreSQL (se usado em produção)
-Recomendado para ambiente de produção devido à performance e robustez.
+7.2 Módulo Lançamento
+- Abertura de OS com validação de centro de custo.
+- Edição e exclusão de OS.
+- Impressão da OS.
+- Apontamento de horas (início/fim) com validações de status e horários.
 
-=======================
-Ferramentas e Ambiente
-=======================
+7.3 Módulo Relatórios
+- Finalização de OS (com observações obrigatórias).
+- Relatório de OS com filtros (por OS e período).
+- Orçamento em PDF.
+- Log detalhado de OS (lista de apontamentos e tempo total).
 
-Virtualenv (venv)
-Ambiente isolado para gerenciamento das dependências do projeto.
+7.4 Módulo Menu
+- Dashboard inicial para navegação.
 
-pip + requirements.txt
-Gerenciamento de pacotes e replicação de ambiente.
+========================================================================================================================
+8. FLUXOS DE USO (PASSO A PASSO)
+========================================================================================================================
 
-Git & GitHub
-Versionamento de código e colaboração.
+8.1 Configuração inicial
+1. Cadastrar centros de custo (estrutura hierárquica).
+2. Cadastrar intervenções (tipos de serviço).
+3. Cadastrar clientes.
+4. Cadastrar colaboradores com turnos e valores hora.
 
-JupyterLab / Notebook (opcional)
-Utilizado para testes, análises ou desenvolvimento auxiliar.
+8.2 Abertura de OS
+1. Acessar Lançamento > Abertura de OS.
+2. Preencher descrição, centro de custo, cliente e intervenção.
+3. Salvar (o número da OS será gerado automaticamente).
 
-====================================
-Dependências Auxiliares do Projeto
-====================================
+8.3 Apontamento de horas
+1. Informar matrícula e número da OS.
+2. Iniciar apontamento.
+3. Finalizar apontamento ao término da atividade.
 
-O projeto utiliza algumas bibliotecas adicionais presentes em requirements.txt, entre elas:
+8.4 Finalização de OS
+1. Acessar Relatórios > Finalizar OS.
+2. Selecionar OS e preencher observações.
+3. Confirmar finalização (status FI).
 
-Django Extensions, Jsonschema, Bleach, BeautifulSoup4, Pandas, NumPy, entre outras que auxiliam no 
-funcionamento e compatibilidade geral do sistema.
+8.5 Relatórios e documentos
+1. Acessar Relatórios > Relatório OS.
+2. Aplicar filtros (OS e período).
+3. Gerar orçamento e/ou PDF.
 
+========================================================================================================================
+9. RELATÓRIOS E DOCUMENTOS
+========================================================================================================================
+Relatórios disponíveis:
+- Relatório de OS (com totais de horas e custos).
+- Orçamento PDF com detalhamento.
+- Log detalhado de OS (histórico de apontamentos por colaborador).
 
+Observações:
+- O PDF é gerado com WeasyPrint e requer dependências de sistema no ambiente de produção.
 
-================================================================================================================
-    Estrutura
-================================================================================================================
+========================================================================================================================
+10. APIS AUXILIARES (AJAX)
+========================================================================================================================
+Endpoints úteis para integração com a interface:
+- /lancamento/get_subcentros/           -> Carrega subcentros de um centro de custo pai
+- /lancamento/api/colaborador/<matricula>/ -> Retorna dados do colaborador
+- /lancamento/api/os/<numero>/          -> Retorna dados básicos da OS
+- /lancamento/api/os/detalhes/<id>/     -> Retorna dados completos da OS
 
+========================================================================================================================
+11. INSTALAÇÃO E EXECUÇÃO (AMBIENTE LOCAL)
+========================================================================================================================
+1) Criar e ativar ambiente virtual:
+   python -m venv .venv
+   source .venv/bin/activate   (Linux/macOS)
+   .venv\Scripts\activate      (Windows)
 
-/Gestor_OS/
-    - cadastro
-        - static
-            - css
-                - cadastro_cliente.css
-                - cadastro_colaborador.css
-                - cadasto_intervencao.css
-                - cadastro_centro_custo.css
-            - js
-                - cadastro_cliente.js
-                - cadastro_colaborador.js
-                - cadasto_intervencoes.js
-                - alternar_arvore_centro_custo.js
-        - template
-            - cadastro_centro
-                - cadastro_centro_custo.html
-                - subcentros.html
-            - cadastro_cliente
-                - cadastro_cliente.html
-            - cadastro_colaborador
-                - cadastro_colaborador.html
-            - cadasto_intervencao
-                - cadasto_intervencao.html
-            - forms.py
-            - models.py
-            - urls.py
-            - views.py
-    - Gestor_OS
-        - settings.py
-        - urls.py
-    - lancamento
-        - static
-            - css
-                - abrir_os.css
-                - apontar_horas.css
-                - impressao.css
-            - img
-                - logo_impresa.png
-            - js
-                - abrir_os.js
-                - apontamento_horas.js
-        - templates
-            - abertura_os
-                - abertura_os.html
-            - apontar_horas
-                - apontar_horas.html
-            - impressao_os
-                -impressao_os.html
-        - forms.py
-        - models.py
-        - urls.py
-        - views.py
-    - menu
-        - static
-            - css
-                - dashboard.css
-        - templates
-            - menu
-                - deshboard.html
-        - urls.py
-        - views.py
-    - templates
-        - base.html
-    - manage.py
-    - requirements.txt
+2) Instalar dependências:
+   pip install -r requirements.txt
 
+3) Executar migrações:
+   python manage.py migrate
 
+4) Criar superusuário:
+   python manage.py createsuperuser
 
-================================================================================================================
-    Cadastro de Clientes
-================================================================================================================
+5) Executar servidor local:
+   python manage.py runserver
 
-O cadastro de cliente possibilita o cadastro dos clites que serão prestados serviços pela empresa , 
-eles possibilitam o controle de quais OS e apontamentos de horas para possamos ter o controle dos Materiais e horas para fatuara para cada cliente
+6) Acessar no navegador:
+   http://127.0.0.1:8000/
 
-O cadastro se consiste em o codigo do cliente que deve ser unico e não se repitir para manter a indentidade de cada cliente
-o Nome / Razão social do cliente para facilitar a identificação de cada
+========================================================================================================================
+12. CONFIGURAÇÕES RELEVANTES
+========================================================================================================================
+Arquivo principal: gestor_os/settings.py
 
-possibilita tambem a edição e exclusão de cadastros acesados pelos icone junto a lista de clientes cadastrados 
+- DEBUG: deve ser False em produção.
+- ALLOWED_HOSTS: deve incluir o domínio do servidor.
+- Banco de dados: configurar PostgreSQL para produção.
+- STATIC_ROOT: definir pasta para coleta de estáticos.
+- CSRF_TRUSTED_ORIGINS: atualizar conforme domínio.
+
+========================================================================================================================
+13. BOAS PRÁTICAS OPERACIONAIS
+========================================================================================================================
+- Realizar backups periódicos do banco de dados.
+- Controlar permissões de acesso aos cadastros e relatórios.
+- Monitorar o uso do sistema e desempenho em relatórios.
+- Validar sequência de OS e orçamentos em ambientes de produção.
+
+========================================================================================================================
+14. SUPORTE E EVOLUÇÃO
+========================================================================================================================
+Sugestões para evolução:
+- Implementar níveis de acesso e permissões por perfil.
+- Integração com folha de pagamento ou ERP.
+- Dashboards de indicadores (custos, horas, produtividade).
+- Exportação de relatórios em Excel.
+
+========================================================================================================================
+Fim da documentação
+========================================================================================================================

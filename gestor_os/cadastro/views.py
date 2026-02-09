@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from .forms import CentroCustoForm, ClienteForm, IntervencaoForm, ColaboradorForm
 from .models import CentroCusto, Cliente, Intervencao, Colaborador
 from django.db.models import Q
 from django.db import models
 from django.db.models import Count
 
+from gestor_os.access import CADASTRO_GROUP, group_required
 
 # =====================================================
 # Cadastro de Centro de Custos
@@ -18,6 +20,9 @@ def montar_hierarquia(centros):
         resultado.append({'centro': centro, 'filhos': filhos})
     return resultado
 
+
+@login_required
+@group_required(CADASTRO_GROUP)
 def cadastrar_centro_custo(request):
     if request.method == 'POST':
         form = CentroCustoForm(request.POST)
@@ -40,7 +45,8 @@ def cadastrar_centro_custo(request):
 # =====================================================
 # Cadastro de Clientes
 # =====================================================
-
+@login_required
+@group_required(CADASTRO_GROUP)
 def cadastro_cliente(request):
     mensagem_erro = None
 
@@ -90,7 +96,8 @@ def cadastro_cliente(request):
         }
     )
 
-
+@login_required
+@group_required(CADASTRO_GROUP)
 def excluir_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
 
@@ -105,6 +112,8 @@ def excluir_cliente(request, pk):
 # =====================================================
 # Cadastro de Intervenções
 # =====================================================
+@login_required
+@group_required(CADASTRO_GROUP)
 def cadastro_intervencao(request):
     if request.method == 'POST':
         interv_id = request.POST.get('intervencao_id')
@@ -147,7 +156,8 @@ def cadastro_intervencao(request):
         }
     )
 
-
+@login_required
+@group_required(CADASTRO_GROUP)
 def excluir_intervencao(request, pk):
     interv = get_object_or_404(Intervencao, pk=pk)
 
@@ -162,7 +172,8 @@ def excluir_intervencao(request, pk):
 # =====================================================
 # Cadastro de Colaboradores
 # =====================================================
-
+@login_required
+@group_required(CADASTRO_GROUP)
 def cadastro_colaborador(request):
     # Formulário
     if request.method == 'POST':
@@ -189,6 +200,8 @@ def cadastro_colaborador(request):
 
     return render(request, 'cadastro_colaborador/cadastro_colaborador.html', context)
 
+@login_required
+@group_required(CADASTRO_GROUP)
 def editar_colaborador(request, pk):
     colaborador = get_object_or_404(Colaborador, pk=pk)
 
@@ -215,7 +228,8 @@ def editar_colaborador(request, pk):
     return render(request, 'cadastro_colaborador/cadastro_colaborador.html', context)
 
 
-
+@login_required
+@group_required(CADASTRO_GROUP)
 def excluir_colaborador(request, pk):
     colaborador = get_object_or_404(Colaborador, pk=pk)
 

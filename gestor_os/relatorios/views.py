@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.dateparse import parse_date
@@ -13,7 +14,7 @@ from weasyprint import HTML
 
 from lancamento.models import AberturaOS, ApontamentoHoras
 from .utils import gerar_proximo_orcamento, montar_dados_log_os
-
+from gestor_os.access import RELATORIOS_GROUP, group_required
 
 # =====================================================
 # CONSTANTES
@@ -50,7 +51,8 @@ def aplicar_filtro_datas(queryset, data_inicio, data_fim):
 # =====================================================
 # FINALIZAR OS
 # =====================================================
-
+@login_required
+@group_required(RELATORIOS_GROUP)
 def finalizar_os(request):
     ordens = AberturaOS.objects.all().order_by("-numero_os")
 
@@ -77,7 +79,8 @@ def finalizar_os(request):
 # =====================================================
 # BUSCAR OS (AJAX)
 # =====================================================
-
+@login_required
+@group_required(RELATORIOS_GROUP)
 def buscar_os(request, numero_os):
     try:
         os_obj = AberturaOS.objects.get(numero_os=numero_os)
@@ -323,13 +326,15 @@ def construir_contexto_relatorio_os(request):
     }
     return context
 
-
+@login_required
+@group_required(RELATORIOS_GROUP)
 def relatorio_os(request):
 
     context = construir_contexto_relatorio_os(request)
 
     return render(request, "relatorio_os/relatorio_os.html", context)
-
+@login_required
+@group_required(RELATORIOS_GROUP)
 def orcamento_pdf(request):
 
     context = construir_contexto_relatorio_os(request)
@@ -339,7 +344,8 @@ def orcamento_pdf(request):
 # =====================================================
 # ORÇAMENTO
 # =====================================================
-
+@login_required
+@group_required(RELATORIOS_GROUP)
 def proximo_orcamento(request):
     return JsonResponse({"numero": str(gerar_proximo_orcamento()).zfill(4)})
 
@@ -347,7 +353,8 @@ def proximo_orcamento(request):
 # =====================================================
 # LOG OS
 # =====================================================
-
+@login_required
+@group_required(RELATORIOS_GROUP)
 def log_os(request, numero_os):
     return render(request, "relatorio_os/orcamento_detalhado.html",
                   montar_dados_log_os(numero_os))
@@ -357,6 +364,8 @@ def log_os(request, numero_os):
 # PDF LOG OS
 # =====================================================
 
+@login_required
+@group_required(RELATORIOS_GROUP)
 def log_os_pdf(request, numero_os):
     os_obj = get_object_or_404(AberturaOS, numero_os=numero_os)
 

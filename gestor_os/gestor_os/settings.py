@@ -120,6 +120,9 @@ STATIC_URL = "/static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+LOGIN_URL = "/admin/login/"
+LOGIN_REDIRECT_URL = "/"
+
 # Corrige erro de CSRF ao usar localhost
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
