@@ -138,12 +138,15 @@
   padding: 24px;
 }
 
+
+
+/* Modal */
 /* Modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.5);
-  display: none; /* inicia oculto */
+  display: none;
   align-items: center;
   justify-content: center;
   z-index: 1000;
@@ -151,19 +154,31 @@
 .modal-overlay.active {
   display: flex;
 }
+
 .modal-card {
   width: min(460px, 95%);
   background: #fff;
   border-radius: 14px;
   padding: 20px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  color: #111827; /* Força textos escuros */
+  font-family: 'Inter', sans-serif;
 }
-.modal-card h2 { margin: 0 0 14px; font-size: 1.25rem; }
-.form-group { margin-bottom: 12px; }
+
+.modal-card h2 {
+  margin: 0 0 14px;
+  font-size: 1.25rem;
+  color: #111827;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
 .form-group label {
   display: block;
   margin-bottom: 4px;
   font-weight: 600;
+  color: #111827; /* Labels visíveis */
 }
 .form-group input {
   width: 100%;
@@ -171,13 +186,41 @@
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 0.95rem;
+  color: #111827; /* Texto dentro do input visível */
+  background: #fff;
 }
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 16px;
 }
+
+.btn-primario {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primario:hover { background: #1e40af; }
+
+.btn-secundario {
+  background: #e5e7eb;
+  color: #111827;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-secundario:hover { background: #d1d5db; }
+
 
 /* Responsivo */
 @media (max-width: 900px) {

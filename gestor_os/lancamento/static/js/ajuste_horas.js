@@ -9,6 +9,7 @@
   const campoFim = document.getElementById('data-fim');
   const btnCancelar = document.getElementById('cancelar-modal');
 
+  // Filtro da tabela
   function aplicarFiltro() {
     const termo = (filtroGeral.value || '').trim().toLowerCase();
     const status = filtroStatus.value;
@@ -27,24 +28,29 @@
     });
   }
 
+  // Abrir modal
   function abrirModal(linha) {
     campoId.value = linha.dataset.id;
     campoInicio.value = linha.dataset.inicio || '';
     campoFim.value = linha.dataset.fim || '';
-    modal.hidden = false;
+    modal.classList.add('active'); // usa CSS
   }
 
+  // Fechar modal
   function fecharModal() {
-    modal.hidden = true;
+    modal.classList.remove('active'); // usa CSS
   }
 
+  // Eventos filtros
   filtroGeral?.addEventListener('input', aplicarFiltro);
   filtroStatus?.addEventListener('change', aplicarFiltro);
 
+  // Eventos abrir modal
   document.querySelectorAll('[data-open-modal]').forEach((botao) => {
     botao.addEventListener('click', () => abrirModal(botao.closest('tr')));
   });
 
+  // Fechar modal
   btnCancelar?.addEventListener('click', fecharModal);
   modal?.addEventListener('click', (event) => {
     if (event.target === modal) {
