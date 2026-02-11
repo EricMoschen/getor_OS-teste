@@ -268,3 +268,75 @@ def api_os_detalhes(request, pk):
         "situacao": os_obj.situacao,
     })
 
+
+
+
+
+
+
+@login_required
+@group_required(LANCAMENTO_GROUP, APONTAMENTO_HORAS_GROUP)
+def ajuste_horas_supervisor(request):
+    if request.method == "POST":
+        apontamento = get_object_or_404(ApontamentoHoras, pk=request.POST.get("apontamento_id"))
+
+        inicio_raw = request.POST.get("data_inicio", "").strip()
+        fim_raw = request.POST.get("data_fim", "").strip()
+
+        if not inicio_raw:
+            messages.error(request, "Preencha a data/hora de início.")
+            return redirect("ajuste_horas_supervisor")
+
+        try:
+            inicio = datetime.fromisoformat(inicio_raw)
+            inicio = timezone.make_aware(inicio) if timezone.is_naive(inicio) else inicio
+        except ValueError:
+            messages.error(request, "Data de início inválida.")
+            return redirect("ajuste_horas_supervisor")
+
+        fim = None
+        if fim_raw:
+            try:
+                fim = datetime.fromisoformat(fim_raw)
+                fim = timezone.make_aware(fim) if timezone.is_naive(fim) else fim
+            except ValueError:
+                messages.error(request, "Data de fim inválida.")
+                return redirect("ajuste_horas_supervisor")
+
+            if fim <= inicio:
+                messages.error(request, "O horário de fim deve ser maior que o horário de início.")
+                return redirect("ajuste_horas_supervisor")
+
+        apontamento.data_inicio = inicio
+        apontamento.data_fim = fim
+        apontamento.tipo_dia = ApontamentoHoras.classificar_tipo_dia(timezone.localtime(inicio).date())
+        apontamento.save(update_fields=["data_inicio", "data_fim", "tipo_dia"])
+
+        messages.success(
+            request,
+            f"Apontamento da OS {apontamento.ordem_servico.numero_os} atualizado com sucesso.",
+        )
+        return redirect("ajuste_horas_supervisor")
+
+    apontamentos = (
+        ApontamentoHoras.objects.select_related("colaborador", "ordem_servico")
+        .order_by("-data_inicio")
+    )
+
+    total = apontamentos.count()
+    em_aberto = apontamentos.filter(data_fim__isnull=True).count()
+    encerrados = total - em_aberto
+    colaboradores_ativos = (
+        apontamentos.filter(data_fim__isnull=True).values("colaborador_id").distinct().count()
+    )
+
+    context = {
+        "apontamentos": apontamentos,
+        "kpis": {
+            "total": total,
+            "em_aberto": em_aberto,
+            "encerrados": encerrados,
+            "colaboradores_ativos": colaboradores_ativos,
+        },
+    }
+    return render(request, "ajuste_horas/ajuste_horas.html", context)

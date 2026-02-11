@@ -42,5 +42,20 @@ com o horario do turno do colaborador:
 
 
 
+
+
  - incluir para que no Relatório das OS as horas devem aparecer somdas apartir do dia 20 de cada mes
-( quado for dia 20 ele zera as horas e começa somar apartir ate o dia 20 do proximo mes)
+ - quado for dia 20 ele zera as horas e começa somar apartir ate o dia 20 do proximo mes)
+
+
+- verificar exclusão dos Centro de custos, seguindo o mesmo padrao dos demais cadastros
+
+- verificar o pq esta puchando 3 horas a frente do cadastrado no banco quando gera os relátorios 
+
+- incluir valores nos Orçamentos de horas
+
+
+- Criar tela para acompanhamento e edição das horas lançadas pelo colaboradores - acesso ao Supervisores
+(Obs: tela com referencia ao Cingo)
+
+- criar inteface para login 

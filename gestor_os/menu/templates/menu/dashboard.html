@@ -28,6 +28,14 @@
                 </a>
             {% endif %}
 
+
+            
+            {% if user|has_any_group:"Administrador,Lancamento,ApontamentoHoras" %}
+                <a href="{% url 'ajuste_horas_supervisor' %}" class="dashboard-card color-purple">
+                    <h2 class="card-title">Ajustar Horários OS</h2>
+                </a>
+            {% endif %}
+
         </div>
         <br/>
     {% endif %}

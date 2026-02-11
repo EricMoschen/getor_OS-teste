@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/ajuste_horas.css' %}">
+{% endblock head %}
+
+{% block body %}
+<div class="ajuste-container">
+  <div class="ajuste-header">
+    <h1>Ajuste de Horários de OS</h1>
+    <p>Painel do supervisor para revisão e correção rápida dos apontamentos.</p>
+  </div>
+
+  <section class="kpis-grid">
+    <article class="kpi-card">
+      <span>Total de apontamentos</span>
+      <strong>{{ kpis.total }}</strong>
+    </article>
+    <article class="kpi-card warning">
+      <span>Em aberto</span>
+      <strong>{{ kpis.em_aberto }}</strong>
+    </article>
+    <article class="kpi-card success">
+      <span>Encerrados</span>
+      <strong>{{ kpis.encerrados }}</strong>
+    </article>
+    <article class="kpi-card info">
+      <span>Colaboradores ativos</span>
+      <strong>{{ kpis.colaboradores_ativos }}</strong>
+    </article>
+  </section>
+
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="alert-message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <section class="filtros-box">
+    <input type="text" id="filtro-geral" class="input-field" placeholder="Filtrar por matrícula, colaborador, OS ou situação...">
+    <select id="filtro-status" class="input-field select-field">
+      <option value="">Todos</option>
+      <option value="aberto">Em aberto</option>
+      <option value="encerrado">Encerrado</option>
+    </select>
+  </section>
+
+  <section class="tabela-box">
+    <table class="tabela-ajustes">
+      <thead>
+        <tr>
+          <th>Matrícula</th>
+          <th>Colaborador</th>
+          <th>OS</th>
+          <th>Início</th>
+          <th>Fim</th>
+          <th>Situação</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="lista-apontamentos">
+        {% for ap in apontamentos %}
+          <tr
+            data-id="{{ ap.id }}"
+            data-matricula="{{ ap.colaborador.matricula|lower }}"
+            data-colaborador="{{ ap.colaborador.nome|lower }}"
+            data-os="{{ ap.ordem_servico.numero_os|lower }}"
+            data-status="{% if ap.data_fim %}encerrado{% else %}aberto{% endif %}"
+            data-inicio="{{ ap.data_inicio|date:'Y-m-d\\TH:i' }}"
+            data-fim="{% if ap.data_fim %}{{ ap.data_fim|date:'Y-m-d\\TH:i' }}{% endif %}"
+          >
+            <td>{{ ap.colaborador.matricula }}</td>
+            <td>{{ ap.colaborador.nome }}</td>
+            <td>{{ ap.ordem_servico.numero_os }}</td>
+            <td>{{ ap.data_inicio|date:"d/m/Y H:i" }}</td>
+            <td>{% if ap.data_fim %}{{ ap.data_fim|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td>
+            <td>
+              <span class="badge {% if ap.data_fim %}encerrado{% else %}aberto{% endif %}">
+                {% if ap.data_fim %}Encerrado{% else %}Em aberto{% endif %}
+              </span>
+            </td>
+            <td>
+              <button type="button" class="btn-ajustar" data-open-modal>Ajustar</button>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" class="sem-registros">Nenhum apontamento encontrado.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<div class="modal-overlay" id="modal-ajuste" hidden>
+  <div class="modal-card">
+    <h2>Ajustar apontamento</h2>
+    <form method="post" action="{% url 'ajuste_horas_supervisor' %}">
+      {% csrf_token %}
+      <input type="hidden" name="apontamento_id" id="apontamento-id">
+
+      <div class="form-group">
+        <label for="data-inicio">Data/Hora início</label>
+        <input type="datetime-local" id="data-inicio" name="data_inicio" required>
+      </div>
+
+      <div class="form-group">
+        <label for="data-fim">Data/Hora fim (opcional)</label>
+        <input type="datetime-local" id="data-fim" name="data_fim">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secundario" id="cancelar-modal">Cancelar</button>
+        <button type="submit" class="btn-primario">Salvar ajuste</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="{% static 'js/ajuste_horas.js' %}"></script>
+{% endblock body %}
